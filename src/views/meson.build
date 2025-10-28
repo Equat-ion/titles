@@ -8,7 +8,6 @@ viewsdir = join_paths(pkgdatadir, 'src/views')
 sources = [
   '__init__.py',
   'main_view.py',
-  'first_run_view.py',
   'db_update_view.py',
   'content_view.py',
 ]

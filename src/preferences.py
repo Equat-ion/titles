@@ -9,19 +9,20 @@ from gettext import gettext as _
 from gettext import pgettext as C_
 from pathlib import Path
 
-from gi.repository import Adw, Gio, GLib, GObject, Gtk
+from gi.repository import Adw, Gio, GLib, GObject, Gtk, Gdk
 
 from . import shared  # type: ignore
 from .background_queue import ActivityType, BackgroundActivity, BackgroundQueue
 from .models.language_model import LanguageModel
 from .providers.local_provider import LocalProvider as local
+from .providers.stremio_addon_service import StremioAddonService
+from .providers.stremio_auth import StremioAuthService
 
 
 @Gtk.Template(resource_path=shared.PREFIX + '/ui/preferences.ui')
 class PreferencesDialog(Adw.PreferencesDialog):
     __gtype_name__ = 'PreferencesDialog'
 
-    _download_group = Gtk.Template.Child()
     _language_comborow = Gtk.Template.Child()
     _language_model = Gtk.Template.Child()
     _update_freq_comborow = Gtk.Template.Child()
@@ -31,6 +32,13 @@ class PreferencesDialog(Adw.PreferencesDialog):
     _exit_cache_switch = Gtk.Template.Child()
     _cache_row = Gtk.Template.Child()
     _data_row = Gtk.Template.Child()
+    
+    # Addon-related widgets
+    _addons_group = Gtk.Template.Child()
+    _login_prompt_row = Gtk.Template.Child()
+    _addons_loading_row = Gtk.Template.Child()
+    _addons_error_row = Gtk.Template.Child()
+    _addons_empty_row = Gtk.Template.Child()
 
     def __init__(self):
         super().__init__()
@@ -48,6 +56,12 @@ class PreferencesDialog(Adw.PreferencesDialog):
             f'Toggled offline mode: {self._offline_switch.get_active()}'))
         self._exit_cache_switch.connect('notify::active', lambda pspec, user_data: logging.debug(
             f'Toggled clear cache on exit: {self._exit_cache_switch.get_active()}'))
+        
+        # Initialize addon service
+        self.addon_service = StremioAddonService()
+        self.auth_service = StremioAuthService()
+        self.current_addons = []
+        self.addon_rows = []
 
     @Gtk.Template.Callback('_on_map')
     def _on_map(self, user_data: object | None) -> None:
@@ -77,12 +91,16 @@ class PreferencesDialog(Adw.PreferencesDialog):
 
         # Update occupied space
         self._update_occupied_space()
+        
+        # Load addons
+        self._load_addons()
 
     def _setup_languages(self):
         self._language_comborow.handler_block(self.language_change_handler)
 
         languages = local.get_all_languages()
-        languages.pop(len(languages)-6)    # remove 'no language'
+        if len(languages) > 6:
+            languages.pop(len(languages)-6)    # remove 'no language'
         for language in languages:
             self._language_model.append(language.name)
 
@@ -396,5 +414,305 @@ class PreferencesDialog(Adw.PreferencesDialog):
             _('{space:.2f} MB occupied').format(space=cache_space))
         self._data_row.set_subtitle(
             _('{space:.2f} MB occupied').format(space=data_space))
+
+    # ==================== Addon Management Methods ====================
+    
+    def _load_addons(self) -> None:
+        """
+        Load addons from Stremio API.
+        Shows appropriate UI state based on login status and fetch result.
+        """
+        # Check if user is logged in
+        if not self.addon_service.is_logged_in():
+            self._show_addon_login_prompt()
+            return
+        
+        # Show loading state
+        self._show_addon_loading()
+        
+        # Fetch addons in background
+        def fetch_task(activity: BackgroundActivity) -> None:
+            try:
+                self.current_addons = self.addon_service.get_addon_collection()
+            except Exception as e:
+                logging.error(f'Failed to fetch addons: {str(e)}')
+                raise
+        
+        BackgroundQueue.add(
+            activity=BackgroundActivity(
+                activity_type=ActivityType.UPDATE,
+                title=_('Loading Addons'),
+                task_function=fetch_task),
+            on_done=self._on_addons_loaded)
+    
+    def _on_addons_loaded(self,
+                          source: GObject.Object,
+                          result: Gio.AsyncResult,
+                          cancellable: Gio.Cancellable,
+                          activity: BackgroundActivity) -> None:
+        """Callback when addons are loaded."""
+        try:
+            activity.end()
+            
+            if len(self.current_addons) == 0:
+                self._show_addon_empty_state()
+            else:
+                self._display_addons()
+                
+        except Exception as e:
+            logging.error(f'Error in addon loading callback: {str(e)}')
+            self._show_addon_error()
+            activity.end()
+    
+    def _show_addon_login_prompt(self) -> None:
+        """Show the login prompt for addons."""
+        self._login_prompt_row.set_visible(True)
+        self._addons_loading_row.set_visible(False)
+        self._addons_error_row.set_visible(False)
+        self._addons_empty_row.set_visible(False)
+    
+    def _show_addon_loading(self) -> None:
+        """Show loading state for addons."""
+        self._login_prompt_row.set_visible(False)
+        self._addons_loading_row.set_visible(True)
+        self._addons_error_row.set_visible(False)
+        self._addons_empty_row.set_visible(False)
+    
+    def _show_addon_error(self) -> None:
+        """Show error state for addons."""
+        self._login_prompt_row.set_visible(False)
+        self._addons_loading_row.set_visible(False)
+        self._addons_error_row.set_visible(True)
+        self._addons_empty_row.set_visible(False)
+    
+    def _show_addon_empty_state(self) -> None:
+        """Show empty state when no addons are installed."""
+        self._login_prompt_row.set_visible(False)
+        self._addons_loading_row.set_visible(False)
+        self._addons_error_row.set_visible(False)
+        self._addons_empty_row.set_visible(True)
+    
+    def _display_addons(self) -> None:
+        """Display the list of addons as ExpanderRows."""
+        # Clear existing rows
+        self._clear_addon_rows()
+        
+        # Hide state rows
+        self._login_prompt_row.set_visible(False)
+        self._addons_loading_row.set_visible(False)
+        self._addons_error_row.set_visible(False)
+        self._addons_empty_row.set_visible(False)
+        
+        # Create ExpanderRow for each addon
+        for index, addon in enumerate(self.current_addons):
+            manifest = addon.get('manifest', {})
+            transport_url = addon.get('transportUrl', '')
+            is_enabled = addon.get('enabled', True)
+            
+            # Get addon details from manifest
+            addon_name = manifest.get('name', 'Unknown Addon')
+            addon_id = manifest.get('id', 'unknown')
+            addon_version = manifest.get('version', 'N/A')
+            addon_description = manifest.get('description', 'No description available')
+            
+            # Create expander row
+            expander = Adw.ExpanderRow()
+            expander.set_title(addon_name)
+            
+            # Build subtitle
+            expander.set_subtitle(f'v{addon_version}')
+            
+            # Enable/Disable switch as a suffix (outside the expander)
+            enable_switch = Gtk.Switch()
+            enable_switch.set_active(is_enabled)
+            enable_switch.set_valign(Gtk.Align.CENTER)
+            enable_switch.connect('notify::active', self._on_addon_toggle, index)
+            expander.add_suffix(enable_switch)
+            
+            # Addon details
+            id_row = Adw.ActionRow()
+            id_row.set_title(_('ID'))
+            id_row.set_subtitle(addon_id)
+            id_row.add_css_class('property')
+            expander.add_row(id_row)
+            
+            version_row = Adw.ActionRow()
+            version_row.set_title(_('Version'))
+            version_row.set_subtitle(addon_version)
+            version_row.add_css_class('property')
+            expander.add_row(version_row)
+            
+            description_row = Adw.ActionRow()
+            description_row.set_title(_('Description'))
+            description_row.set_subtitle(addon_description)
+            description_row.set_subtitle_lines(3)
+            description_row.add_css_class('property')
+            expander.add_row(description_row)
+            
+            url_row = Adw.ActionRow()
+            url_row.set_title(_('URL'))
+            url_row.set_subtitle(transport_url)
+            url_row.add_css_class('property')
+            expander.add_row(url_row)
+            
+            # Configure button (if addon supports configuration)
+            if manifest.get('behaviorHints', {}).get('configurable', False):
+                configure_row = Adw.ActionRow()
+                configure_row.set_title(_('Configure Addon'))
+                configure_row.set_activatable(True)
+                
+                configure_btn = Gtk.Button()
+                configure_btn.set_label(_('Configure'))
+                configure_btn.set_valign(Gtk.Align.CENTER)
+                configure_btn.connect('clicked', self._on_addon_configure, index, transport_url)
+                configure_row.add_suffix(configure_btn)
+                
+                expander.add_row(configure_row)
+            
+            # Remove button
+            remove_row = Adw.ActionRow()
+            remove_row.set_title(_('Remove Addon'))
+            remove_row.set_activatable(True)
+            
+            remove_btn = Gtk.Button()
+            remove_btn.set_label(_('Remove'))
+            remove_btn.set_valign(Gtk.Align.CENTER)
+            remove_btn.add_css_class('destructive-action')
+            remove_btn.connect('clicked', self._on_addon_remove, index)
+            remove_row.add_suffix(remove_btn)
+            
+            expander.add_row(remove_row)
+            
+            # Add to main group
+            self._addons_group.add(expander)
+            self.addon_rows.append(expander)
+    
+    def _clear_addon_rows(self) -> None:
+        """Clear all addon rows from the list."""
+        for row in self.addon_rows:
+            self._addons_group.remove(row)
+        self.addon_rows.clear()
+    
+    def _on_addon_toggle(self, switch: Gtk.Switch, pspec: GObject.ParamSpec, index: int) -> None:
+        """Handle addon enable/disable toggle."""
+        is_enabled = switch.get_active()
+        
+        logging.info(f'Toggling addon {index} to {"enabled" if is_enabled else "disabled"}')
+        
+        if is_enabled:
+            self.current_addons = self.addon_service.enable_addon(self.current_addons, index)
+        else:
+            self.current_addons = self.addon_service.disable_addon(self.current_addons, index)
+        
+        # Save changes
+        self._save_addon_changes()
+    
+    def _on_addon_configure(self, button: Gtk.Button, index: int, transport_url: str) -> None:
+        """Handle addon configuration button click."""
+        # Open addon configuration page in browser
+        configure_url = f'{transport_url.rstrip("/")}/configure'
+        logging.info(f'Opening addon configuration: {configure_url}')
+        
+        Gtk.show_uri(self, configure_url, Gdk.CURRENT_TIME)
+    
+    def _on_addon_remove(self, button: Gtk.Button, index: int) -> None:
+        """Handle addon removal button click."""
+        addon_name = self.current_addons[index].get('manifest', {}).get('name', 'this addon')
+        
+        # Show confirmation dialog
+        dialog = Adw.AlertDialog.new(
+            _('Remove Addon?'),
+            _('Are you sure you want to remove "{}"? This action cannot be undone.').format(addon_name)
+        )
+        
+        dialog.add_response('cancel', _('Cancel'))
+        dialog.add_response('remove', _('Remove'))
+        dialog.set_response_appearance('remove', Adw.ResponseAppearance.DESTRUCTIVE)
+        dialog.set_default_response('cancel')
+        dialog.set_close_response('cancel')
+        
+        dialog.connect('response', self._on_remove_addon_response, index)
+        dialog.present(self)
+    
+    def _on_remove_addon_response(self, dialog: Adw.AlertDialog, response: str, index: int) -> None:
+        """Handle addon removal confirmation response."""
+        if response == 'remove':
+            logging.info(f'Removing addon {index}')
+            self.current_addons = self.addon_service.remove_addon(self.current_addons, index)
+            
+            # Save changes and refresh display
+            self._save_addon_changes()
+            self._display_addons()
+    
+    def _save_addon_changes(self) -> None:
+        """Save addon collection changes to Stremio API."""
+        def save_task(activity: BackgroundActivity) -> None:
+            try:
+                self.addon_service.set_addon_collection(self.current_addons)
+            except Exception as e:
+                logging.error(f'Failed to save addon changes: {str(e)}')
+                raise
+        
+        BackgroundQueue.add(
+            activity=BackgroundActivity(
+                activity_type=ActivityType.UPDATE,
+                title=_('Saving Changes'),
+                task_function=save_task),
+            on_done=self._on_addon_changes_saved)
+    
+    def _on_addon_changes_saved(self,
+                                source: GObject.Object,
+                                result: Gio.AsyncResult,
+                                cancellable: Gio.Cancellable,
+                                activity: BackgroundActivity) -> None:
+        """Callback when addon changes are saved."""
+        activity.end()
+        logging.info('Addon changes saved successfully')
+    
+    @Gtk.Template.Callback('_on_addon_login_clicked')
+    def _on_addon_login_clicked(self, user_data: object | None) -> None:
+        """Handle login button click in addons tab."""
+        logging.debug('Addon login button clicked')
+        
+        # Import and show login dialog
+        try:
+            from .dialogs.stremio_login_dialog import StremioLoginDialog
+            
+            logging.debug('Creating StremioLoginDialog')
+            login_dialog = StremioLoginDialog()
+            
+            # Get the parent window from the preferences dialog
+            parent_window = self.get_root()
+            logging.debug(f'Parent window: {parent_window}')
+            
+            if parent_window:
+                logging.debug('Presenting dialog with parent window')
+                login_dialog.present(parent_window)
+            else:
+                logging.debug('Presenting dialog with self as parent')
+                login_dialog.present(self)
+            
+            # Connect to login success signal
+            logging.debug('Connecting to login-success signal')
+            login_dialog.connect('login-success', self._on_login_success)
+            logging.debug('Login dialog presented successfully')
+                
+        except ImportError as e:
+            logging.error(f'StremioLoginDialog import failed: {e}')
+            # Fallback: just reload addons (in case user logged in elsewhere)
+            self._load_addons()
+        except Exception as e:
+            logging.error(f'Failed to show login dialog: {e}', exc_info=True)
+    
+    def _on_login_success(self, dialog, user_data=None) -> None:
+        """Handle successful login from dialog."""
+        logging.info('Login successful, reloading addons')
+        self._load_addons()
+    
+    @Gtk.Template.Callback('_on_addon_retry_clicked')
+    def _on_addon_retry_clicked(self, user_data: object | None) -> None:
+        """Handle retry button click in error state."""
+        logging.debug('Addon retry button clicked')
+        self._load_addons()
 
 

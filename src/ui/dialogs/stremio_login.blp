@@ -1,0 +1,112 @@
+// Copyright (C) 2025 Alessandro Iepure
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+using Gtk 4.0;
+using Adw 1;
+
+template $StremioLoginDialog: Adw.Dialog {
+  title: _("Login to Stremio");
+  content-width: 400;
+  content-height: 300;
+
+  child: Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {
+      show-title: false;
+    }
+
+    content: Adw.ToastOverlay _toast_overlay {
+      child: Adw.Clamp {
+        maximum-size: 400;
+        tightening-threshold: 300;
+
+        child: Box {
+          orientation: vertical;
+          spacing: 24;
+          margin-top: 24;
+          margin-bottom: 24;
+          margin-start: 24;
+          margin-end: 24;
+
+          Box {
+            orientation: vertical;
+            spacing: 12;
+
+            Label {
+              label: _("Sign In");
+              styles ["title-1"]
+              halign: center;
+            }
+
+            Label {
+              label: _("Enter your Stremio account credentials");
+              styles ["dim-label"]
+              halign: center;
+              wrap: true;
+              justify: center;
+            }
+          }
+
+          Adw.PreferencesGroup {
+            Adw.EntryRow _email_entry {
+              title: _("Email");
+              input-purpose: email;
+
+              changed => $_on_entry_changed();
+
+              [suffix]
+              Image {
+                icon-name: "mail-unread-symbolic";
+                styles ["dim-label"]
+              }
+            }
+
+            Adw.PasswordEntryRow _password_entry {
+              title: _("Password");
+
+              changed => $_on_entry_changed();
+              activate => $_on_login_clicked();
+            }
+          }
+
+          Box {
+            orientation: vertical;
+            spacing: 12;
+
+            Button _login_button {
+              label: _("Sign In");
+              sensitive: false;
+              styles ["suggested-action", "pill"]
+
+              clicked => $_on_login_clicked();
+            }
+
+            Button _cancel_button {
+              label: _("Cancel");
+
+              clicked => $_on_cancel_clicked();
+            }
+          }
+
+          Box {
+            orientation: vertical;
+            spacing: 6;
+            margin-top: 12;
+
+            Label {
+              label: _("Don't have an account?");
+              styles ["dim-label", "caption"]
+            }
+
+            LinkButton {
+              label: _("Create a Stremio Account");
+              uri: "https://www.stremio.com/";
+              halign: center;
+            }
+          }
+        };
+      };
+    };
+  };
+}

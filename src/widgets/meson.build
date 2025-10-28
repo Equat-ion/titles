@@ -15,6 +15,9 @@ sources = [
   'season_expander.py',
   'background_indicator.py',
   'background_activity_row.py',
+  'account_button.py',
+  'catalog_row.py',
+  'catalog_item.py',
 ]
 
 install_data(sources, install_dir: widgetsdir)

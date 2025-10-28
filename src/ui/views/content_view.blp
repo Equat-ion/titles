@@ -11,8 +11,8 @@ template $ContentView: Adw.Bin {
 
       child: Adw.StatusPage {
         icon-name: bind template.icon-name;
-        title: _("Your Watchlist Is Empty");
-        description: _("Add content with the + button or import from an older watchlist.");
+        title: _("No Catalogs Available");
+        description: _("Install Stremio addons to see content catalogs here.");
       };
     }
 
@@ -70,7 +70,7 @@ template $ContentView: Adw.Bin {
             margin-end: 12;
 
             Label _heading_lbl {
-              label: "Loading your watchlist…";
+              label: "Loading catalogs…";
               wrap: true;
               halign: center;
               justify: center;
@@ -81,7 +81,7 @@ template $ContentView: Adw.Bin {
             }
 
             Label _status_lbl {
-              label: "Get your popcorns ready";
+              label: "Fetching content from Stremio addons";
               halign: center;
               justify: center;
               wrap: true;
@@ -95,88 +95,27 @@ template $ContentView: Adw.Bin {
       name: "filled";
 
       child: ScrolledWindow {
-        Box {
-          orientation: vertical;
-
-          Box _full_box {
-            visible: false;
+        hscrollbar-policy: never;
+        vscrollbar-policy: automatic;
+        
+        Adw.Clamp {
+          maximum-size: 1400;
+          
+          Box _catalog_sections_box {
             orientation: vertical;
-            spacing: 12;
-            halign: start;
-
-            Label _title_lbl {
-              halign: start;
-              margin-start: 12;
-              margin-top: 12;
-              label: _("Your Watchlist");
-
-              styles [
-                "title-1"
-              ]
-            }
-
-            FlowBox _flow_box {
-              orientation: horizontal;
-              min-children-per-line: 2;
-              max-children-per-line: 15;
-              selection-mode: none;
-              halign: start;
-            }
-          }
-
-          Box _separated_box {
-            visible: false;
-            orientation: vertical;
-            spacing: 12;
-            halign: start;
-
-            Box _unwatched_box {
-              orientation: vertical;
-
-              Label {
-                halign: start;
-                margin-start: 12;
-                margin-top: 12;
-                label: _("Unwatched");
-
-                styles [
-                  "title-1"
-                ]
-              }
-
-              FlowBox _unwatched_flow_box {
-                orientation: horizontal;
-                min-children-per-line: 2;
-                max-children-per-line: 15;
-                selection-mode: none;
-                halign: start;
-              }
-            }
-
-            Box _watched_box {
-              orientation: vertical;
-
-              Label {
-                halign: start;
-                margin-start: 12;
-                margin-top: 12;
-                label: _("Watched");
-
-                styles [
-                  "title-1"
-                ]
-              }
-
-              FlowBox _watched_flow_box {
-                orientation: horizontal;
-                min-children-per-line: 2;
-                max-children-per-line: 15;
-                selection-mode: none;
-                halign: start;
-              }
-            }
+            spacing: 6;
+            margin-bottom: 12;
           }
         }
+      };
+    }
+
+    Adw.ViewStackPage {
+      name: "catalog-full";
+
+      child: Adw.StatusPage {
+        title: _("Full catalog");
+        description: _("This page is a placeholder for the full catalog view.");
       };
     }
   }

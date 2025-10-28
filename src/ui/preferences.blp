@@ -7,6 +7,8 @@ using Adw 1;
 
 template $PreferencesDialog: Adw.PreferencesDialog {
   search-enabled: false;
+  content-width: 700;
+  content-height: 600;
 
   map => $_on_map();
 
@@ -73,6 +75,65 @@ template $PreferencesDialog: Adw.PreferencesDialog {
             icon-name: "right";
           }
         }
+      }
+    }
+  }
+
+  Adw.PreferencesPage {
+    name: "addons";
+    title: _("Addons");
+    icon-name: "puzzle-piece-symbolic";
+
+    Adw.PreferencesGroup _addons_group {
+      title: C_("preferences", "Installed Addons");
+
+      // Login prompt - shown when not logged in
+      Adw.ActionRow _login_prompt_row {
+        title: C_("preferences", "Login Required");
+        subtitle: C_("preferences", "Please login to your Stremio account to manage addons");
+        activatable: true;
+        visible: false;
+        activated => $_on_addon_login_clicked();
+
+        Button _login_button {
+          label: _("Login");
+          valign: center;
+          clicked => $_on_addon_login_clicked();
+
+          styles [
+            "suggested-action",
+          ]
+        }
+      }
+
+      // Loading state
+      Adw.ActionRow _addons_loading_row {
+        title: C_("preferences", "Loading addons...");
+        visible: false;
+
+        Gtk.Spinner {
+          spinning: true;
+          valign: center;
+        }
+      }
+
+      // Error state
+      Adw.ActionRow _addons_error_row {
+        title: C_("preferences", "Failed to load addons");
+        visible: false;
+
+        Button {
+          label: _("Retry");
+          valign: center;
+          clicked => $_on_addon_retry_clicked();
+        }
+      }
+
+      // Empty state (no addons)
+      Adw.ActionRow _addons_empty_row {
+        title: C_("preferences", "No Addons Installed");
+        subtitle: C_("preferences", "You don't have any addons installed on your Stremio account");
+        visible: false;
       }
     }
   }

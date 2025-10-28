@@ -83,7 +83,8 @@ blueprint-compiler batch-compile "$BUILD_DIR/ui/views" "$SCRIPT_DIR/src/ui/views
 blueprint-compiler batch-compile "$BUILD_DIR/ui/dialogs" "$SCRIPT_DIR/src/ui/dialogs" \
     "$SCRIPT_DIR/src/ui/dialogs/add_manual.blp" \
     "$SCRIPT_DIR/src/ui/dialogs/edit_season.blp" \
-    "$SCRIPT_DIR/src/ui/dialogs/message_dialogs.blp"
+    "$SCRIPT_DIR/src/ui/dialogs/message_dialogs.blp" \
+    "$SCRIPT_DIR/src/ui/dialogs/stremio_login.blp"
 
 blueprint-compiler batch-compile "$BUILD_DIR/ui/pages" "$SCRIPT_DIR/src/ui/pages" \
     "$SCRIPT_DIR/src/ui/pages/edit_episode_page.blp" \
@@ -97,7 +98,10 @@ blueprint-compiler batch-compile "$BUILD_DIR/ui/widgets" "$SCRIPT_DIR/src/ui/wid
     "$SCRIPT_DIR/src/ui/widgets/image_selector.blp" \
     "$SCRIPT_DIR/src/ui/widgets/season_expander.blp" \
     "$SCRIPT_DIR/src/ui/widgets/background_indicator.blp" \
-    "$SCRIPT_DIR/src/ui/widgets/background_activity_row.blp"
+    "$SCRIPT_DIR/src/ui/widgets/background_activity_row.blp" \
+    "$SCRIPT_DIR/src/ui/widgets/account_button.blp" \
+    "$SCRIPT_DIR/src/ui/widgets/catalog_row.blp" \
+    "$SCRIPT_DIR/src/ui/widgets/catalog_item.blp"
 
 # Copy CSS files
 echo -e "$GREEN""Copying CSS files...""$NC"
@@ -119,6 +123,7 @@ printf '<?xml version="1.0" encoding="UTF-8"?>
     <file compressed="true" preprocess="xml-stripblanks">ui/dialogs/add_manual.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/dialogs/edit_season.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/dialogs/message_dialogs.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/dialogs/stremio_login.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/pages/edit_episode_page.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/pages/details_page.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/widgets/theme_switcher.ui</file>
@@ -129,6 +134,9 @@ printf '<?xml version="1.0" encoding="UTF-8"?>
     <file compressed="true" preprocess="xml-stripblanks">ui/widgets/season_expander.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/widgets/background_indicator.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/widgets/background_activity_row.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/widgets/account_button.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/widgets/catalog_row.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/widgets/catalog_item.ui</file>
     <file>css/style.css</file>
     <file>css/style-dark.css</file>
   </gresource>

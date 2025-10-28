@@ -1,0 +1,35 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+using Gtk 4.0;
+using Adw 1;
+
+template $ShowMoreCard: Box {
+  orientation: vertical;
+  halign: start;
+  valign: start;
+
+  Adw.Clamp {
+    maximum-size: 180;
+
+    Button _button {
+      styles ["flat"]
+      overflow: hidden;
+      clicked => $_on_button_clicked();
+
+      Box {
+        orientation: vertical;
+        halign: center;
+        valign: center;
+        height-request: 260;
+
+        Label _label {
+          label: "Show more";
+          halign: center;
+          valign: center;
+          wrap: true;
+          styles ["title-3"]
+        }
+      }
+    }
+  }
+}

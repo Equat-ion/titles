@@ -38,6 +38,8 @@ from .widgets.episode_row import EpisodeRow
 from .widgets.image_selector import ImageSelector
 from .widgets.poster_button import PosterButton
 from .widgets.search_result_row import SearchResultRow
+from .widgets.account_button import AccountButton
+from .dialogs.stremio_login_dialog import StremioLoginDialog
 from .window import TicketboothWindow
 from .providers.local_provider import LocalProvider as local
 
@@ -57,6 +59,8 @@ class TicketboothApplication(Adw.Application):
         ImageSelector,
         BackgroundIndicator,
         BackgroundActivityRow,
+        AccountButton,
+        StremioLoginDialog,
     ]
 
     def __init__(self):

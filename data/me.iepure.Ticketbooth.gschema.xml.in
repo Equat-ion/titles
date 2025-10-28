@@ -114,5 +114,19 @@ SPDX-License-Identifier: GPL-3.0-or-later
 			<summary>Clear cache on exit</summary>
 		</key>
 
+		<!-- Stremio Authentication -->
+		<key name="stremio-auth-key" type="s">
+			<default>''</default>
+			<summary>Stremio authentication key</summary>
+		</key>
+		<key name="stremio-user-email" type="s">
+			<default>''</default>
+			<summary>Stremio user email</summary>
+		</key>
+		<key name="stremio-user-id" type="s">
+			<default>''</default>
+			<summary>Stremio user ID</summary>
+		</key>
+
 	</schema>
 </schemalist>

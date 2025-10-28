@@ -1,0 +1,118 @@
+// Copyright (C) 2025 Alessandro Iepure
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+using Gtk 4.0;
+using Adw 1;
+
+template $AccountButton: Adw.Bin {
+  MenuButton _menu_button {
+    styles ["flat", "circular"]
+    tooltip-text: _("Account");
+
+    child: Overlay {
+      [overlay]
+      Adw.Avatar _avatar {
+        size: 24;
+        show-initials: true;
+        text: "";
+      }
+    };
+
+    popover: Popover {
+      styles ["menu"]
+      width-request: 250;
+
+      child: Box {
+        orientation: vertical;
+        spacing: 12;
+        margin-top: 12;
+        margin-bottom: 12;
+        margin-start: 12;
+        margin-end: 12;
+
+        // Logged in state
+        Box _logged_in_box {
+          visible: false;
+          orientation: vertical;
+          spacing: 12;
+
+          Box {
+            orientation: horizontal;
+            spacing: 12;
+
+            Adw.Avatar _popover_avatar {
+              size: 48;
+              show-initials: true;
+              text: "";
+            }
+
+            Box {
+              orientation: vertical;
+              spacing: 4;
+              valign: center;
+              hexpand: true;
+
+              Label _user_email {
+                label: "";
+                halign: start;
+                ellipsize: end;
+                max-width-chars: 20;
+                styles ["heading"]
+              }
+
+              Label {
+                label: _("Stremio Account");
+                halign: start;
+                styles ["dim-label", "caption"]
+              }
+            }
+          }
+
+          Separator {}
+
+          Button _logout_button {
+            label: _("Sign Out");
+            styles ["flat"]
+
+            clicked => $_on_logout_clicked();
+          }
+        }
+
+        // Logged out state
+        Box _logged_out_box {
+          visible: true;
+          orientation: vertical;
+          spacing: 12;
+
+          Box {
+            orientation: vertical;
+            spacing: 6;
+
+            Label {
+              label: _("Not Signed In");
+              halign: start;
+              styles ["heading"]
+            }
+
+            Label {
+              label: _("Sign in to sync your library");
+              halign: start;
+              wrap: true;
+              styles ["dim-label", "caption"]
+            }
+          }
+
+          Separator {}
+
+          Button _login_button {
+            label: _("Sign In");
+            styles ["suggested-action"]
+
+            clicked => $_on_login_clicked();
+          }
+        }
+      };
+    };
+  }
+}

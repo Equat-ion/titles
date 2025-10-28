@@ -1,0 +1,72 @@
+// Copyright (C) 2025 Alessandro Iepure
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+using Gtk 4.0;
+
+template $CatalogRow: Box {
+  orientation: vertical;
+  spacing: 6;
+  margin-start: 12;
+  margin-end: 12;
+  margin-top: 12;
+
+  Box {
+    orientation: vertical;
+    spacing: 3;
+
+    Label _title_label {
+      halign: start;
+      label: bind template.catalog-name;
+      
+      styles [
+        "title-2"
+      ]
+    }
+
+    Label _subtitle_label {
+      halign: start;
+      label: bind template.addon-name;
+      
+      styles [
+        "caption",
+        "dim-label"
+      ]
+    }
+  }
+
+  /* Use a two-row layout (no horizontal scrolling) and a "Show more" button. */
+  Box {
+    orientation: vertical;
+    spacing: 8;
+
+    Box _rows_box {
+      orientation: vertical;
+      spacing: 12;
+      margin-start: 12;
+      margin-end: 12;
+
+      Box _row1 {
+        orientation: horizontal;
+        spacing: 12;
+      }
+
+      Box _row2 {
+        orientation: horizontal;
+        spacing: 12;
+      }
+    }
+
+    Box {
+      orientation: horizontal;
+      halign: end;
+      margin-end: 12;
+
+      Button _show_more_button {
+        label: _('Show more');
+        halign: end;
+        clicked => $_on_show_more_clicked();
+      }
+    }
+  }
+}

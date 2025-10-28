@@ -7,15 +7,12 @@ import logging
 from gettext import gettext as _
 from typing import Callable
 
-from gi.repository import Adw, GObject, Gtk
-
-import src.providers.local_provider as local
+from gi.repository import Adw, GObject, Gtk, GLib
 
 from .. import shared  # type: ignore
-from ..models.movie_model import MovieModel
-from ..models.series_model import SeriesModel
-from ..pages.details_page import DetailsView
-from ..widgets.poster_button import PosterButton
+from ..widgets.catalog_row import CatalogRow
+from ..widgets.catalog_item import CatalogItem
+from ..providers.stremio_catalog_service import StremioCatalogService
 
 
 @Gtk.Template(resource_path=shared.PREFIX + '/ui/views/content_view.ui')
@@ -40,150 +37,172 @@ class ContentView(Adw.Bin):
 
     _stack = Gtk.Template.Child()
     _updating_status_lbl = Gtk.Template.Child()
-    _title_lbl = Gtk.Template.Child()
-    _flow_box = Gtk.Template.Child()
-    _full_box = Gtk.Template.Child()
-    _separated_box = Gtk.Template.Child()
-    _unwatched_box = Gtk.Template.Child()
-    _unwatched_flow_box = Gtk.Template.Child()
-    _watched_box = Gtk.Template.Child()
-    _watched_flow_box = Gtk.Template.Child()
+    _catalog_sections_box = Gtk.Template.Child()
 
     def __init__(self, movie_view: bool):
         super().__init__()
         self.movie_view = movie_view
         self.icon_name = 'movies' if self.movie_view else 'series'
+        self.catalog_service = StremioCatalogService()
+        self._catalogs_loaded = False
+        self._catalog_sections_cache = None
 
-        self._stack.set_visible_child_name('loading')
+        # Show filled state immediately so UI is responsive
+        self._stack.set_visible_child_name('filled')
+        
+        # Load catalog sections in background (only once)
+        if not self._catalogs_loaded:
+            self._load_catalog_sections()
 
-        self._load_content(self.movie_view)
-
-        self._set_sorting_function()
-        self._set_filter_function()
-
-        shared.schema.connect('changed::view-sorting', self._on_sort_changed)
-        shared.schema.connect('changed::separate-watched',
-                              self._on_separate_watched_changed)
-        shared.schema.connect('changed::hide-watched',
-                              self._on_hide_watched_changed)
-        shared.schema.connect('changed::search-query',
-                              self._on_search_enabled_changed)
-
-    def _on_sort_changed(self, pspec: GObject.ParamSpec, user_data: object | None) -> None:
+    def _load_catalog_sections(self) -> None:
         """
-        Callback for the "changed" signal.
-        Calls the function to set the sorting function on the FlowBox.
-
+        Load catalog sections from Stremio addons.
+        
         Args:
-            pspec (GObject.ParamSpec): pspec of the changed property
-            user_data (object or None): additional data passed to the callback
-
+            None
+        
         Returns:
             None
         """
-
-        self._set_sorting_function()
-
-    def _on_separate_watched_changed(self, pspec: GObject.ParamSpec, user_data: object | None) -> None:
-        """
-        Callback for the "changed" signal.
-
-
-        Args:
-            pspec (GObject.ParamSpec): pspec of the changed property
-            user_data (object or None): additional data passed to the callback
-
-        Returns:
-            None
-        """
-
-        self.refresh_view()
-
-    def _on_hide_watched_changed(self, pspec: GObject.ParamSpec, user_data: object | None) -> None:
-        """
-        Callback for the "changed" signal.
-
-
-        Args:
-            pspec (GObject.ParamSpec): pspec of the changed property
-            user_data (object or None): additional data passed to the callback
-
-        Returns:
-            None
-        """
-
-        self._set_filter_function()
-
-    def _load_content(self, movie_view: bool) -> None:
-        """
-        For each title currently in the db, creates a PosterButton and adds it to the FlowBox.
-
-        Args:
-            movie_view (bool): if true it will load movies, otherwise it will load series
-
-        Returns:
-            None
-        """
-
-        # self._stack.set_visible_child_name('loading')
-        if movie_view:
-            content = local.LocalProvider.get_all_movies()
-        else:
-            content = local.LocalProvider.get_all_series()
-
-        if not content:
-            self._stack.set_visible_child_name('empty')
+        # Return if already loaded
+        if self._catalogs_loaded and self._catalog_sections_cache:
             return
-        else:
-            self._stack.set_visible_child_name('filled')
+            
+        # Clear existing catalog sections
+        while child := self._catalog_sections_box.get_first_child():
+            self._catalog_sections_box.remove(child)
+        
+        # Add a loading indicator
+        loading_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
+        loading_box.set_margin_start(12)
+        loading_box.set_margin_top(24)
+        loading_box.set_halign(Gtk.Align.CENTER)
+        
+        loading_label = Gtk.Label(label=_("Loading catalogs from Stremio addons..."))
+        loading_label.add_css_class("title-2")
+        loading_label.set_halign(Gtk.Align.CENTER)
+        
+        spinner = Adw.Spinner()
+        spinner.set_size_request(32, 32)
+        spinner.set_halign(Gtk.Align.CENTER)
+        
+        loading_box.append(loading_label)
+        loading_box.append(spinner)
+        self._catalog_sections_box.append(loading_box)
+        
+        # Determine content type based on current view
+        content_type = 'movie' if self.movie_view else 'series'
+        
+        logging.info(f'Loading catalog sections for type: {content_type}')
+        
+        # Fetch catalogs in a thread to avoid blocking UI
+        def fetch_catalogs_threaded():
+            try:
+                catalog_sections = self.catalog_service.fetch_all_catalogs_for_type(content_type)
+                
+                # Schedule UI updates on the main thread
+                def update_ui():
+                    # Remove loading indicator
+                    while child := self._catalog_sections_box.get_first_child():
+                        self._catalog_sections_box.remove(child)
+                    
+                    if not catalog_sections:
+                        logging.info('No catalogs found or error occurred')
+                        # Show empty message
+                        empty_label = Gtk.Label(label=_("No catalogs available. Install Stremio addons to see content."))
+                        empty_label.add_css_class("dim-label")
+                        empty_label.set_margin_start(12)
+                        empty_label.set_margin_top(24)
+                        empty_label.set_halign(Gtk.Align.START)
+                        self._catalog_sections_box.append(empty_label)
+                        return False
+                    
+                    logging.info(f'Loaded {len(catalog_sections)} catalog sections')
+                    
+                    # Cache the sections and mark as loaded
+                    self._catalog_sections_cache = catalog_sections
+                    self._catalogs_loaded = True
+                    
+                    # Create a CatalogRow for each catalog section
+                    for section in catalog_sections:
+                        catalog_row = CatalogRow(
+                            catalog_name=section['catalog_name'],
+                            addon_name=section['addon_name']
+                        )
+                        # Connect show-more signal so we can navigate to a full catalog page
+                        catalog_row.connect('show-more', lambda src, s=section: self._open_catalog_full(s))
 
-        for item in content:
-            logging.debug(
-                f'Created poster button for [{"movie" if self.movie_view else "TV series"}] {item.title}')
-            btn = PosterButton(content=item)
-            btn.connect('clicked', self._on_clicked)
-            if not shared.schema.get_boolean('search-enabled') and shared.schema.get_boolean('separate-watched'):
-                if item.watched:
-                    self._watched_flow_box.insert(btn, -1)
-                else:
-                    self._unwatched_flow_box.insert(btn, -1)
-            else:
-                self._flow_box.insert(btn, -1)
+                        # Add up to 9 catalog items to the preview row (two rows layout)
+                        for i, item in enumerate(section['items']):
+                            if i >= 9:
+                                break
 
-        idx = 0
-        while self._flow_box.get_child_at_index(idx):
-            self._flow_box.get_child_at_index(idx).set_focusable(False)
-            idx += 1
+                            catalog_item = CatalogItem(item)
+                            catalog_item.connect('clicked', self._on_catalog_item_clicked)
+                            catalog_row.add_item(catalog_item)
 
-        idx = 0
-        while self._watched_flow_box.get_child_at_index(idx):
-            self._watched_flow_box.get_child_at_index(idx).set_focusable(False)
-            idx += 1
+                        # Show the 'Show more' button only if there are more than 9 items
+                        try:
+                            catalog_row.set_show_more_visible(len(section['items']) > 9)
+                        except Exception:
+                            # If the method isn't available for some reason, ignore
+                            pass
+                        
+                        self._catalog_sections_box.append(catalog_row)
+                    
+                    return False  # Don't repeat
+                
+                GLib.idle_add(update_ui)
+                
+            except Exception as e:
+                logging.error(f'Error fetching catalogs: {str(e)}')
+                import traceback
+                logging.error(traceback.format_exc())
+                
+                # Show error message on main thread
+                def show_error():
+                    while child := self._catalog_sections_box.get_first_child():
+                        self._catalog_sections_box.remove(child)
+                    
+                    error_label = Gtk.Label(label=_("Failed to load catalogs. Check your internet connection."))
+                    error_label.add_css_class("error")
+                    error_label.set_margin_start(12)
+                    error_label.set_margin_top(24)
+                    error_label.set_halign(Gtk.Align.START)
+                    self._catalog_sections_box.append(error_label)
+                    return False
+                
+                GLib.idle_add(show_error)
+        
+        # Run in a background thread
+        import threading
+        thread = threading.Thread(target=fetch_catalogs_threaded, daemon=True)
+        thread.start()
 
-        idx = 0
-        while self._watched_flow_box.get_child_at_index(idx):
-            self._watched_flow_box.get_child_at_index(idx).set_focusable(False)
-            idx += 1
-
-        self._full_box.set_visible(False)
-        self._separated_box.set_visible(False)
-        self._unwatched_box.set_visible(False)
-        self._watched_box.set_visible(False)
-
-        if not shared.schema.get_boolean('search-enabled') and shared.schema.get_boolean('separate-watched'):
-            self._separated_box.set_visible(True)
-            if self._watched_flow_box.get_child_at_index(0) is not None:
-                self._watched_box.set_visible(True)
-            if self._unwatched_flow_box.get_child_at_index(0) is not None:
-                self._unwatched_box.set_visible(True)
-        else:
-            self._full_box.set_visible(True)
-
-        # self._stack.set_visible_child_name('filled')
+    def _on_catalog_item_clicked(self, source: Gtk.Widget, meta_object: dict) -> None:
+        """
+        Callback for catalog item click.
+        Opens a details view for the catalog item (currently just logs).
+        
+        Args:
+            source (Gtk.Widget): Widget that emitted the signal
+            meta_object (dict): The meta preview object from Stremio
+        
+        Returns:
+            None
+        """
+        item_id = meta_object.get('id', 'unknown')
+        item_name = meta_object.get('name', 'Unknown')
+        item_type = meta_object.get('type', 'unknown')
+        
+        logging.info(f'Clicked on catalog item: {item_name} (ID: {item_id}, Type: {item_type})')
+        
+        # TODO: Open details page for this catalog item
+        # For now, we just log the click as requested
 
     def refresh_view(self) -> None:
         """
-        Causes the view to refresh its contents by replacing the content of the FlowBox.
+        Causes the view to refresh its contents by reloading catalog sections.
 
         Args:
             None
@@ -191,177 +210,19 @@ class ContentView(Adw.Bin):
         Returns:
             None
         """
+        self._load_catalog_sections()
 
-        # self._stack.set_visible_child_name('loading')
-
-        self._flow_box.remove_all()
-        self._watched_flow_box.remove_all()
-        self._unwatched_flow_box.remove_all()
-
-        self._load_content(self.movie_view)
-
-    def _on_clicked(self, source: Gtk.Widget, content: MovieModel | SeriesModel) -> None:
-        """
-        Callback for the "clicked" signal.
-        Opens the details view for the selected content.
+    def _open_catalog_full(self, section: dict) -> None:
+        """Open the blank full-catalog page (placeholder).
 
         Args:
-            source (Gtk.Widget): widget that emited the signal
-            movie (MovieModel): associated movie
+            section: The catalog section dict (unused for now but provided for future use)
 
         Returns:
             None
         """
-
-        logging.info(
-            f'Clicked on [{"movie" if self.movie_view else "TV series"}] {content.title}')
-        page = DetailsView(content, self)
-        page.connect('deleted', lambda *args: self.refresh_view())
-        self.get_ancestor(Adw.NavigationView).push(page)
-
-    def _set_sorting_function(self) -> None:
-        """
-        Based on the current setting, sets the sorting function of the FlowBox.
-
-        Args:
-            None
-
-        Returns;
-            None
-        """
-
-        def get_sort_func(key: str) -> Callable | None:
-            match key:
-                case 'az':
-                    return lambda child1, child2, user_data: (
-                        (child1.get_child().title > child2.get_child().title) -
-                        (child1.get_child().title < child2.get_child().title)
-                    )
-                case 'za':
-                    return lambda child1, child2, user_data: (
-                        (child1.get_child().title < child2.get_child().title) -
-                        (child1.get_child().title > child2.get_child().title)
-                    )
-                case 'added-date-new':
-                    return lambda child1, child2, user_data: (
-                        (child1.get_child().content.add_date < child2.get_child().content.add_date) -
-                        (child1.get_child().content.add_date >
-                        child2.get_child().content.add_date)
-                    )
-                case 'added-date-old':
-                    return lambda child1, child2, user_data: (
-                        (child1.get_child().content.add_date > child2.get_child().content.add_date) -
-                        (child1.get_child().content.add_date <
-                        child2.get_child().content.add_date)
-                    )
-                case 'released-date-new':
-                    return lambda child1, child2, user_data: (
-                        (child1.get_child().content.release_date < child2.get_child().content.release_date) -
-                        (child1.get_child().content.release_date >
-                        child2.get_child().content.release_date)
-                    )
-                case 'released-date-old':
-                    return lambda child1, child2, user_data: (
-                        (child1.get_child().content.release_date > child2.get_child().content.release_date) -
-                        (child1.get_child().content.release_date <
-                        child2.get_child().content.release_date)
-                    )
-            return None
-        
-        sort_key = shared.schema.get_string('view-sorting')
-        sort_func = get_sort_func(sort_key)
-
-        if not shared.schema.get_boolean('search-enabled') and shared.schema.get_boolean('separate-watched'):
-            # Apply sorting to both watched and unwatched flow boxes
-            if sort_func:
-                self._watched_flow_box.set_sort_func(sort_func, None)
-                self._unwatched_flow_box.set_sort_func(sort_func, None)
-                self._watched_flow_box.invalidate_sort()
-                self._unwatched_flow_box.invalidate_sort()
-        else:
-            # Apply sorting to the main flow box
-            if sort_func:
-                self._flow_box.set_sort_func(sort_func, None)
-                self._flow_box.invalidate_sort()
-
-    def _set_filter_function(self) -> None:
-        """
-        Based on the current setting, sets the filter function of the FlowBox.
-
-        Args:
-            None
-
-        Returns;
-            None
-        """
-                    
-        if shared.schema.get_boolean('search-enabled'):
-            if shared.schema.get_string('search-mode') == 'title':
-                self._flow_box.set_filter_func(
-                    lambda child,
-                    user_data: (
-                        shared.schema.get_string(
-                            'search-query').lower() in child.get_child().content.title.lower()
-                    ),
-                    None)
-            elif shared.schema.get_string('search-mode') == 'genre':
-                self._flow_box.set_filter_func(
-                    lambda child, user_data: (
-                        any(
-                            shared.schema.get_string(
-                                'search-query').title() in genre
-                            for genre in child.get_child().content.genres)
-                    ),
-                    None)
-            elif shared.schema.get_string('search-mode') == 'overview':
-                self._flow_box.set_filter_func(
-                    lambda child, user_data: (
-                        shared.schema.get_string(
-                            'search-query').lower() in child.get_child().content.overview.lower()
-                    ),
-                    None)
-            elif shared.schema.get_string('search-mode') == 'notes':
-                self._flow_box.set_filter_func(
-                    lambda child, user_data: (
-                        shared.schema.get_string(
-                            'search-query').lower() in child.get_child().content.notes.lower()
-                    ),
-                    None)
-            elif shared.schema.get_string('search-mode') == 'tmdb-id':
-                self._flow_box.set_filter_func(
-                    lambda child, user_data: (
-                        shared.schema.get_string(
-                            'search-query').lower() in child.get_child().content.id.lower()
-                    ),
-                    None)
-            self._flow_box.invalidate_filter()
-            return
-
-        if shared.schema.get_boolean('hide-watched'):
-            self._flow_box.set_filter_func(lambda child, user_data: (
-                not child.get_child().content.watched), None)
-            self._flow_box.invalidate_filter()
-            return
-
-        self._flow_box.set_filter_func(lambda child, user_data: True, None)
-        self._flow_box.invalidate_filter()
-
-    def _on_search_enabled_changed(self, pspec: GObject.ParamSpec, user_data: object | None) -> None:
-        """
-        Callback for the "changed" signal.
-        Refreshes the view when the search is enabled or disabled.
-
-        Args:
-            pspec (GObject.ParamSpec): pspec of the changed property
-            user_data (object or None): additional data passed to the callback
-
-        Returns:
-            None
-        """
-
-        self._title_lbl.set_label(_("Search results") if shared.schema.get_boolean(
-            'search-enabled') else _("Your Watchlist"))
-
-        self.refresh_view()
-
-        self._set_filter_function()
+        # For now, just switch the view stack page to the placeholder
+        try:
+            self._stack.set_visible_child_name('catalog-full')
+        except Exception:
+            logging.debug('Unable to switch to full catalog page')
