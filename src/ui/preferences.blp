@@ -14,22 +14,6 @@ template $PreferencesDialog: Adw.PreferencesDialog {
     name: "preferences";
     title: _("Preferences");
 
-    Adw.PreferencesGroup _download_group {
-      title: C_("preferences", "Optional Download");
-      description: C_("preferences", "For a complete experience, a download of 15 KB is required. The initial setup could not retrieve the data automatically and thus offline mode has been activated. It will remain active until the setup is completed.");
-
-      Adw.ActionRow _download_row {
-        // TRANSLATORS: When clicked, it completes the initial setup by downloading the optional data.
-        title: C_("preferences", "Complete Setup");
-        activated => $_on_download_activate();
-        activatable: true;
-
-        Image {
-          icon-name: "right";
-        }
-      }
-    }
-
     Adw.PreferencesGroup _offline_group {
       title: C_("preferences", "Offline Mode");
       description: C_("preferences", "Ticket Booth can work entirely offline. If you choose to run in this mode, some features that require the Internet and/or access to third party APIs will not be available.");
@@ -39,12 +23,12 @@ template $PreferencesDialog: Adw.PreferencesDialog {
       }
     }
 
-    Adw.PreferencesGroup _tmdb_group {
-      title: C_("preferences", "The Movie Database (TMDB)");
-      description: C_("preferences", "TMDB provides localized metadata for most content. Ticket Booth will download it in your prefered language, selectable below. In case it is not available, it will fallback to English US and then to the content's original language. If neither are available, it will result in a blank string. Please consider <a href='https://www.themoviedb.org/bible/new_content'>contributing to TMDB</a>. Additionally, an automatic update is performed on a frequency of your choosing.");
+    Adw.PreferencesGroup {
+      title: C_("preferences", "Language");
+      description: C_("preferences", "Select your preferred language for content metadata.");
 
       Adw.ComboRow _language_comborow {
-        title: C_("preferences", "TMDB Results Language");
+        title: C_("preferences", "Results Language");
         model: StringList _language_model {};
       }
 
@@ -59,26 +43,6 @@ template $PreferencesDialog: Adw.PreferencesDialog {
             C_("preferences", "Monthly")
           ]
         };
-      }
-
-      Adw.SwitchRow _use_own_key_switch {
-        title: C_("preferences", "Use Your API Key");
-        subtitle: C_("preferences", "Register yours <a href='https://www.themoviedb.org/settings/api'>here</a>");
-      }
-
-      Adw.EntryRow _own_key_entryrow {
-        title: C_("preferences", "Your API key");
-        visible: bind _use_own_key_switch.active;
-
-        [suffix]
-        Button _check_own_key_button {
-          label: C_("preferences", "Save Key");
-          valign: center;
-
-          clicked => $_on_check_own_key_button_clicked();
-        }
-
-        changed => $_on_own_key_changed();
       }
     }
 

@@ -13,16 +13,6 @@ template $MainView: Adw.Bin {
     scope: global;
 
     Shortcut {
-      trigger: "<control>n";
-      action: "action(win.add-tmdb)";
-    }
-
-    Shortcut {
-      trigger: "<control><shift>n";
-      action: "action(win.add-manual)";
-    }
-
-    Shortcut {
       trigger: "F5";
       action: "action(win.refresh)";
     }
@@ -64,13 +54,6 @@ template $MainView: Adw.Bin {
             };
 
             [start]
-            MenuButton _add_btn {
-              icon-name: "plus";
-              tooltip-text: _("Add a title to your library");
-              menu-model: _add_menu;
-            }
-
-            [start]
             ToggleButton _show_search_btn {
               icon-name: "loupe";
               tooltip-text: _("Show/Hide search bar");
@@ -105,8 +88,7 @@ template $MainView: Adw.Bin {
                     C_("Search mode", "Title"), 
                     C_("Search mode", "Genre"), 
                     C_("Search mode", "Overview"), 
-                    C_("Search mode", "Notes"), 
-                    C_("Search mode", "TMDB ID")
+                    C_("Search mode", "Notes")
                   ]
                 };
                 selected: 0;      
@@ -244,17 +226,5 @@ menu _primary_menu {
       label: _("_About Ticket Booth");
       action: "app.about";
     }
-  }
-}
-
-menu _add_menu {
-  item {
-    label: _("From The Movie Database (TMDB)");
-    action: "win.add-tmdb";
-  }
-
-  item {
-    label: _("Manually");
-    action: "win.add-manual";
   }
 }

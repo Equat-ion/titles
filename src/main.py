@@ -30,8 +30,7 @@ from .models.search_result_model import SearchResultModel
 from .preferences import PreferencesDialog
 from .views.content_view import ContentView
 from .pages.details_page import DetailsView
-from .views.first_run_view import FirstRunView
-from .views.db_update_view import DbUpdateView
+# from .views.db_update_view import DbUpdateView  # TMDB removed
 from .views.main_view import MainView
 from .widgets.background_activity_row import BackgroundActivityRow
 from .widgets.background_indicator import BackgroundIndicator
@@ -51,8 +50,7 @@ class TicketboothApplication(Adw.Application):
         PosterButton,
         SearchResultRow,
         DetailsView,
-        DbUpdateView,
-        FirstRunView,
+        # DbUpdateView,  # TMDB removed
         MainView,
         ContentView,
         EpisodeRow,
@@ -117,7 +115,6 @@ class TicketboothApplication(Adw.Application):
             # your name <your email>
             # your name website
         ])
-        about_dialog.add_legal_section('Movie and TV Series Metadata', 'This product uses the TMDB API but is not endorsed or certified by TMDB.', Gtk.License.CUSTOM, 'All rights belong to their respective owners.')
         logging.debug('About window open')
         about_dialog.present(self.props.active_window)
 

@@ -11,7 +11,6 @@ import requests
 from gi.repository import GObject
 
 import src.providers.local_provider as local
-import src.providers.tmdb_provider as tmdb
 
 from .. import shared  # type: ignore
 from ..models.episode_model import EpisodeModel
@@ -86,8 +85,8 @@ class SeasonModel(GObject.GObject):
             self.title = d['name']
             self.show_id = show_id
 
-            self.episodes = self._parse_episodes(
-                tmdb.TMDBProvider.get_season_episodes(show_id, self.number))
+            # Episodes will need to be loaded from local provider or manually
+            self.episodes = []
         else:
             self.episodes_number = t[0]  # type: ignore
             self.id = t[1]  # type: ignore

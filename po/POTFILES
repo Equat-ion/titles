@@ -8,7 +8,7 @@ src/preferences.py
 src/window.py
 
 src/dialogs/add_manual_dialog.py
-src/dialogs/add_tmdb_dialog.py
+# src/dialogs/add_tmdb_dialog.py - TMDB removed
 src/dialogs/edit_season_dialog.py
 
 src/pages/details_page.py
@@ -16,7 +16,7 @@ src/pages/edit_episode_page.py
 
 src/ui/about_dialog.blp
 src/ui/dialogs/add_manual.blp
-src/ui/dialogs/add_tmdb.blp
+# src/ui/dialogs/add_tmdb.blp - TMDB removed
 src/ui/dialogs/edit_season.blp
 src/ui/dialogs/message_dialogs.blp
 src/ui/gtk/help-overlay.blp
@@ -24,8 +24,8 @@ src/ui/pages/details_page.blp
 src/ui/pages/edit_episode_page.blp
 src/ui/preferences.blp
 src/ui/views/content_view.blp
-src/ui/views/db_update_view.blp
-src/ui/views/first_run_view.blp
+# src/ui/views/db_update_view.blp - TMDB removed
+# src/ui/views/first_run_view.blp - First run removed
 src/ui/views/main_view.blp
 src/ui/widgets/background_activity_row.blp
 src/ui/widgets/background_indicator.blp
@@ -38,8 +38,8 @@ src/ui/widgets/theme_switcher.blp
 src/ui/window.blp
 
 src/views/content_view.py
-src/views/db_update_view.py
-src/views/first_run_view.py
+# src/views/db_update_view.py - TMDB removed
+# src/views/first_run_view.py - First run removed
 src/views/main_view.py
 
 src/widgets/background_activity_row.py

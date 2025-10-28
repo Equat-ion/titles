@@ -22,7 +22,6 @@ from ..models.season_model import SeasonModel
 from ..models.series_model import SeriesModel
 from ..models.episode_model import EpisodeModel
 from ..providers.local_provider import LocalProvider as local
-from ..providers.tmdb_provider import TMDBProvider as tmdb
 from ..widgets.episode_row import EpisodeRow
 from ..widgets.theme_switcher import ThemeSwitcher
 
@@ -533,16 +532,6 @@ class DetailsView(Adw.NavigationPage):
                        if self.content.in_production else _('No')))
             self._flow_box.append(box)
 
-        if self.content.id and self.content.manual == False:
-            box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
-            label = Gtk.Label(label=_('TMDB ID'))
-            label.add_css_class('heading')
-            box.append(label)
-            url_str = '<a href="https://www.themoviedb.org/{category}/{id}" title="TMDB Webpage"> {id} </a>' \
-                .format(category=("tv") if type(self.content) is SeriesModel else ("movie"), id=self.content.id)
-            box.append(Gtk.Label(label=url_str, use_markup=True))
-            self._flow_box.append(box)
-
         if self._flow_box.get_child_at_index(0) is None:
             self._additional_info_box.set_visible(False)
 
@@ -698,13 +687,15 @@ class DetailsView(Adw.NavigationPage):
         """
 
         if type(self.content) is MovieModel:
-            self.new_content = MovieModel(tmdb.get_movie(self.content.id))
-            local.update_movie(old=self.content, new=self.new_content)
-            self.new_content = local.get_movie_by_id(self.content.id)
+            # Update not available without TMDB provider
+            logging.warning('Update requested but TMDB provider not available')
+            activity.error()
+            return
         else:
-            self.new_content = SeriesModel(tmdb.get_serie(self.content.id))
-            local.update_series(old=self.content, new=self.new_content)
-            self.new_content = local.get_series_by_id(self.content.id)
+            # Update not available without TMDB provider
+            logging.warning('Update requested but TMDB provider not available')
+            activity.error()
+            return
 
     def _on_update_done(self,
                         source: GObject.Object,

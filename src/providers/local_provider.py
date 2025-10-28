@@ -20,7 +20,6 @@ from ..models.language_model import LanguageModel
 from ..models.movie_model import MovieModel
 from ..models.season_model import SeasonModel
 from ..models.series_model import SeriesModel
-from ..providers.tmdb_provider import TMDBProvider as tmdb
 
 
 class LocalProvider:
@@ -461,10 +460,10 @@ class LocalProvider:
     @staticmethod
     def add_movie(id: int = 0, movie: MovieModel | None = None) -> int | None:
         """
-        Inserts a movie in the movies table, querying the data from TMDB if only id is provided.
+        Inserts a movie in the movies table.
 
         Args:
-            id (int): tmdb id to query
+            id (int): movie id
             movie (MovieModel or None): movie to add
 
         Returns:
@@ -472,7 +471,8 @@ class LocalProvider:
         """
 
         if not movie:
-            movie = MovieModel(tmdb.get_movie(id))
+            logging.error('Cannot add movie without MovieModel object')
+            return None
 
         with sqlite3.connect(shared.db) as connection:
             sql = """INSERT INTO movies (
@@ -533,10 +533,10 @@ class LocalProvider:
     @staticmethod
     def add_series(id: int = 0, serie: SeriesModel | None = None) -> int | None:
         """
-        Inserts a tv series in the series table, querying the data from TMDB if only id is provided.
+        Inserts a tv series in the series table.
 
         Args:
-            id (int): tmdb id to query
+            id (int): series id
             serie (SeriesModel or None): tv series to add
 
         Returns:
@@ -544,7 +544,8 @@ class LocalProvider:
         """
 
         if not serie:
-            serie = SeriesModel(tmdb.get_serie(id))
+            logging.error('Cannot add series without SeriesModel object')
+            return None
 
         with sqlite3.connect(shared.db) as connection:
             sql = """INSERT INTO series (

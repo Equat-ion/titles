@@ -16,7 +16,6 @@ from .. import shared  # type: ignore
 from ..models.movie_model import MovieModel
 from ..models.series_model import SeriesModel
 from ..providers.local_provider import LocalProvider as local
-from ..providers.tmdb_provider import TMDBProvider as tmdb
 
 @Gtk.Template(resource_path=shared.PREFIX + '/ui/views/db_update_view.ui')
 class DbUpdateView(Adw.Bin):

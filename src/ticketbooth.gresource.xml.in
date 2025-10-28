@@ -28,7 +28,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
     <!-- Dialogs -->
     <file preprocess="xml-stripblanks">ui/dialogs/add_manual.ui</file>
-    <file preprocess="xml-stripblanks">ui/dialogs/add_tmdb.ui</file>
+    <!-- <file preprocess="xml-stripblanks">ui/dialogs/add_tmdb.ui</file> TMDB removed -->
     <file preprocess="xml-stripblanks">ui/dialogs/edit_season.ui</file>
     <file preprocess="xml-stripblanks">ui/dialogs/message_dialogs.ui</file>
 
@@ -37,8 +37,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <file preprocess="xml-stripblanks">ui/window.ui</file>
     <file preprocess="xml-stripblanks">ui/about_dialog.ui</file>
     <file preprocess="xml-stripblanks">ui/preferences.ui</file>
-    <file preprocess="xml-stripblanks">ui/views/db_update_view.ui</file>
-    <file preprocess="xml-stripblanks">ui/views/first_run_view.ui</file>
+    <!-- <file preprocess="xml-stripblanks">ui/views/db_update_view.ui</file> TMDB removed -->
+    <!-- <file preprocess="xml-stripblanks">ui/views/first_run_view.ui</file> First run removed -->
     <file preprocess="xml-stripblanks">ui/views/main_view.ui</file>
     <file preprocess="xml-stripblanks">ui/views/content_view.ui</file>
 

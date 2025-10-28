@@ -12,10 +12,7 @@ from gi.repository import Adw, Gio, GLib, Gtk
 
 from . import shared  # type: ignore
 from .background_queue import BackgroundQueue
-from .dialogs.add_manual_dialog import AddManualDialog
-from .dialogs.add_tmdb_dialog import AddTMDBDialog
-from .views.first_run_view import FirstRunView
-from .views.db_update_view import DbUpdateView
+# from .views.db_update_view import DbUpdateView  # TMDB removed
 from .views.main_view import MainView
 from .providers.local_provider import LocalProvider as local
 
@@ -54,36 +51,6 @@ class TicketboothWindow(Adw.ApplicationWindow):
         self.set_state(new_state)
         logging.debug(f'Sort: {new_state}')
         shared.schema.set_string('view-sorting', str(new_state)[1:-1])
-
-    def _add_tmdb(self, new_state: None, source: Gtk.Widget) -> None:
-        """
-        Callback for the win.add-tmdb action
-
-        Args:
-            new_state (None): stateless action, always None
-
-        Returns:
-            None
-        """
-
-        dialog = AddTMDBDialog()
-        logging.info('Add from TMDB dialog open')
-        dialog.present(source)
-
-    def _add_manual(self, new_state: None, source: Gtk.Widget) -> None:
-        """
-        Callback for the win.add-manual action
-
-        Args:
-            new_state (None): stateless action, always None
-
-        Returns:
-            None
-        """
-
-        dialog = AddManualDialog()
-        logging.info('Add manual dialog open')
-        dialog.present(source)
 
     def _refresh(self, new_state: None, source: Gtk.Widget) -> None:
         """
@@ -186,8 +153,6 @@ class TicketboothWindow(Adw.ApplicationWindow):
             'separate-watched') else 'false', _separate_watched_changed),
         ('hide-watched', None, None, 'true' if shared.schema.get_boolean('hide-watched')
          else 'false', _hide_watched_changed),
-        ('add-tmdb', _add_tmdb),
-        ('add-manual', _add_manual),
         ('refresh', _refresh),
         ('update-backgroud-indicator', _update_background_indicator),
         ('search', None, None, 'true' if shared.schema.get_boolean('search-enabled')
@@ -202,14 +167,11 @@ class TicketboothWindow(Adw.ApplicationWindow):
         if shared.DEBUG:
             self.add_css_class('devel')
 
-        shared.schema.bind('offline-mode', self.lookup_action('add-tmdb'),
-                           'enabled', Gio.SettingsBindFlags.INVERT_BOOLEAN)
         shared.schema.bind('separate-watched', self.lookup_action('hide-watched'),
                            'enabled', Gio.SettingsBindFlags.INVERT_BOOLEAN)
 
-        if shared.schema.get_boolean('onboard-complete'):
-            Gio.NetworkMonitor.get_default().connect(
-                'network-changed', self._on_network_changed)
+        Gio.NetworkMonitor.get_default().connect(
+            'network-changed', self._on_network_changed)
 
     @Gtk.Template.Callback('_on_close_request')
     def _on_close_request(self, user_data: object | None) -> bool:
@@ -261,26 +223,16 @@ class TicketboothWindow(Adw.ApplicationWindow):
         Returns:
             None
         """
-
-        is_first_run = shared.schema.get_boolean('first-run')
-        logging.info(f'is first run: {is_first_run}')
-        if is_first_run:
-            logging.info('Start first run setup')
-            self.first_run_view = FirstRunView()
-            self._win_stack.add_named(child=self.first_run_view, name='first-run')
-            self._win_stack.set_visible_child_name('first-run')
-            self.first_run_view.connect('exit', self._on_first_run_exit)
-            shared.schema.set_boolean('db-needs-update', False)
-            return
-            
-        db_needs_update = shared.schema.get_boolean('db-needs-update')
-        if db_needs_update:
-            logging.info('Start db update')
-            self.db_update_view = DbUpdateView()
-            self._win_stack.add_named(child=self.db_update_view, name='db-update')
-            self._win_stack.set_visible_child_name('db-update')
-            self.db_update_view.connect('exit', self._on_db_update_exit)
-            return
+        
+        # TMDB removed - db update no longer needed
+        # db_needs_update = shared.schema.get_boolean('db-needs-update')
+        # if db_needs_update:
+        #     logging.info('Start db update')
+        #     self.db_update_view = DbUpdateView()
+        #     self._win_stack.add_named(child=self.db_update_view, name='db-update')
+        #     self._win_stack.set_visible_child_name('db-update')
+        #     self.db_update_view.connect('exit', self._on_db_update_exit)
+        #     return
             
         self._win_stack.add_named(child=MainView(self), name='main')
         self._win_stack.set_visible_child_name('main')
@@ -304,21 +256,6 @@ class TicketboothWindow(Adw.ApplicationWindow):
 
         shared.schema.set_boolean(
             'offline-mode', GLib.Variant.new_boolean(not network_available))
-
-    def _on_first_run_exit(self, source: Gtk.Widget) -> None:
-        """
-        Callback for the "exit" signal. Changes the visible view.
-
-        Args:
-            None
-
-        Returns:
-            None
-        """
-
-        logging.info('First setup done')
-        self._win_stack.add_named(child=MainView(self), name='main')
-        self._win_stack.set_visible_child_name('main')
 
     def _on_db_update_exit(self, source: Gtk.Widget) -> None:
         """

@@ -15,7 +15,6 @@ from ..background_queue import (ActivityType, BackgroundActivity,
 from ..models.movie_model import MovieModel
 from ..models.series_model import SeriesModel
 from ..providers.local_provider import LocalProvider as local
-from ..providers.tmdb_provider import TMDBProvider as tmdb
 from ..views.content_view import ContentView
 from ..widgets.theme_switcher import ThemeSwitcher
 
@@ -115,8 +114,7 @@ class MainView(Adw.Bin):
             None
         """
 
-        if not shared.schema.get_boolean('first-run'):
-            self._check_update_content()
+        self._check_update_content()
 
     def _check_update_content(self) -> None:
         """
@@ -190,7 +188,7 @@ class MainView(Adw.Bin):
 
     def _update_content(self, activity: BackgroundActivity) -> None:
         """
-        Performs a content update on content added from TMDB.
+        Performs a content update on manually added content.
 
         Args:
             activity (BackgroundActivity): the calling activity
@@ -199,19 +197,9 @@ class MainView(Adw.Bin):
             None
         """
 
-        movies = local.get_all_movies()
-        if movies:
-            for movie in movies:    # type: ignore
-                if not movie.manual:
-                    new_movie = MovieModel(tmdb.get_movie(movie.id))
-                    local.update_movie(old=movie, new=new_movie)
-
-        series = local.get_all_series()
-        if series:
-            for serie in series:    # type: ignore
-                if not serie.manual:
-                    new_serie = SeriesModel(tmdb.get_serie(serie.id))
-                    local.update_series(old=serie, new=new_serie)
+        # TMDB updates removed - only manual content supported now
+        logging.info('Automatic TMDB updates no longer supported')
+        return
 
     def _on_update_done(self,
                         source: GObject.Object,
@@ -234,204 +222,9 @@ class MainView(Adw.Bin):
         Returns:
             None
         """
-        series = local.get_all_series_notification_list()
-
-        new_release_series = []
-        soon_release_series = []
-        out_of_production_series = []
-
-        for serie in series:
-
-            last_air_date = datetime.strptime(serie.last_air_date, '%Y-%m-%d')
-
-            # Get the latest info for the series from TMDB
-            new_serie = SeriesModel(tmdb.get_serie(serie.id))
-            new_last_air_date = datetime.strptime(
-                new_serie.last_air_date, '%Y-%m-%d')
-            if new_serie.next_air_date != '':
-                new_next_air_date = datetime.strptime(
-                    new_serie.next_air_date, '%Y-%m-%d')
-            else:
-                # create bogus next air date if it does not exist
-                new_next_air_date = datetime.now() + timedelta(days=10)
-
-            # Check if the latest release is newer than the last saved in the database -> new release has come out.
-            if last_air_date < new_last_air_date:
-                # Set the new release status and add the series to the new releases list and set soon_release to false
-                local.set_new_release_status(serie.id, True)
-                local.set_soon_release_status(serie.id, False)
-                local.set_recent_change_status(serie.id, True)
-                new_release_series.append(new_serie)
-                # we only save one, since we do not use it if more than one series has a new release
-                new_release_series_span = datetime.now() - new_last_air_date
-
-            # Check if the next air date is set to soon (7 days in the future)
-            if datetime.now() + timedelta(days=7) > new_next_air_date:
-                local.set_soon_release_status(serie.id, True)
-                # if we also detect a considerable amount of time bewteen epsidoe notify user that the series has new releases coming soon.
-                # 3 weeks are chosen to include the new streaming release model of two chunks a month apart but not spam the user for weekly or bi-weekly releases
-                if new_next_air_date - timedelta(days=20) > last_air_date:
-                    local.set_recent_change_status(serie.id, True)
-                    soon_release_series.append(new_serie)
-                    soon_release_series_span = new_next_air_date - datetime.now()
-
-            # Check if the series went from in production to not in production
-            if serie.in_production == 1 and new_serie.in_production == 0:
-                local.set_recent_change_status(serie.id, True)
-                out_of_production_series.append(new_serie)
-                local.set_notification_list_status(serie.id, False)
-
-            # refetch serie to get all the correct flags that we set from the database
-            serie = local.get_series_by_id(serie.id)
-            local.update_series(serie, new_serie)
-
-        movies = local.get_all_movies_notification_list()
-
-        new_release_movies = []
-        soon_release_movies = []
-
-        for movie in movies:
-
-            # Get the latest info for the movie from TMDB
-            new_movie = MovieModel(tmdb.get_movie(movie.id))
-            release_date = datetime.strptime(
-                new_movie.release_date, '%Y-%m-%d')
-
-            if release_date < datetime.now():
-                local.set_recent_change_status(movie.id, True, movie=True)
-                local.set_new_release_status(movie.id, True, movie=True)
-                local.set_soon_release_status(movie.id, False, movie=True)
-                if not movie.new_release:  # if new_release was not set send a notification
-                    new_release_movies_span = datetime.now() - release_date
-                    new_release_movies.append(new_movie)
-            elif release_date < datetime.now() + timedelta(days=14):
-                local.set_recent_change_status(movie.id, True, movie=True)
-                local.set_soon_release_status(movie.id, True, movie=True)
-                if not movie.soon_release:  # if soon_release was not set send a notification
-                    soon_release_movies_span = release_date - datetime.now()
-                    soon_release_movies.append(new_movie)
-            # For movies we do not need to refetch the movie from the local db since the new data gets inserted by SQL UPDATE
-            local.update_movie(movie, new_movie)
-
-        def length_check(x): return len(x) > 0
-        count = length_check(new_release_movies) + length_check(new_release_series) + length_check(
-            soon_release_movies) + length_check(soon_release_series) + length_check(out_of_production_series)
-
-        if count == 0:
-            return
-        elif count == 1:
-            if new_release_series:
-                if len(new_release_series) == 1:
-                    # TRANSLATOR: {title} is the title of the series
-                    title = _("New release for {title}").format(
-                        title=new_release_series[0].title)
-                    # TRANSLATOR: {title} is the title of the series and {days} the number of days
-                    body = N_("A new episode of {title} was released {days} day ago.", "A new episode of {title} was released {days} days ago.",
-                              new_release_series_span.days).format(title=new_release_series[0].title, days=new_release_series_span.days)
-                else:
-                    # TRANSLATOR: {num} is the number of TV Series
-                    title = _("New release for {num} TV series on your watchlist").format(
-                        num=len(new_release_series))
-                    series = ", ".join(new.title for new in new_release_series)
-                    # TRANSLATOR: {series} is a list of TV series seperated by a comma
-                    body = _("The TV Series are {series}.").format(
-                        series=series)
-
-            if soon_release_series:
-                if len(soon_release_series) == 1:
-                    # TRANSLATOR: {title} is the title of the series with a new episode soon
-                    title = _("{title} will have a release soon").format(
-                        title=soon_release_series[0].title)
-                    # TRANSLATOR: {title} is the title of the series and {days} the number of days
-                    body = N_("A new episode will release in {days} day.", "A new episode will release in {days} days.", soon_release_series_span.days).format(
-                        title=soon_release_series[0].title, days=soon_release_series_span.days)
-                else:
-                    # TRANSLATOR: {num} is the number of TV Series
-                    title = _("{num} TV Series on your watchlist will have a new episode soon").format(
-                        num=len(soon_release_series))
-                    series = ", ".join(
-                        soon.title for soon in soon_release_series)
-                    # TRANSLATOR: {series} is a list of all series affected seperated by a comma
-                    body = _("The TV Series are {series}.").format(
-                        series=series)
-
-            if out_of_production_series:
-                if len(out_of_production_series) == 1:
-                    # TRANSLATOR: {title} is the title of the series that has gone out of production
-                    title = _("{title} has gone out of production").format(
-                        title=out_of_production_series[0].title)
-                    # TRANSLATOR: {title} is the title of the series that has gone out of production
-                    body = _("{title} has wrapped up its run. Now is the perfect time to revisit your favorite moments or find the next binge!")
-                else:
-                    # TRANSLATOR: {num} is the number of TV Series
-                    title = _("{num} TV Series of your watchlist have gone out of production").format(
-                        num=len(out_of_production_series))
-                    series = ", ".join(
-                        out.title for out in out_of_production_series)
-                    # TRANSLATOR: {series} is a list of all series affected seperated by a comma
-                    body = _("The TV Series are {series}.").format(
-                        series=series)
-
-            if new_release_movies:
-                if len(new_release_movies) == 1:
-                    # TRANSLATOR: {title} is the title of the movie that has had its release
-                    title = _("{title} has had its release!").format(
-                        title=new_release_movies[0].title)
-                    # TRANSLATOR: {title} is the title of the series and {days} the number of days
-                    body = N_("{title} was released {days} day ago.", "{title} was released {days} days ago.", new_release_movies_span.days).format(
-                        title=new_release_movies[0].title, days=new_release_movies_span.days)
-                else:
-                    title = _("{num} movies on your watchlist have had their releases.").format(
-                        num=len(new_release_movies))
-                    movies = ", ".join(new.title for new in new_release_movies)
-                    # TRANSLATOR: {movies} is a list of all movies affected seperated by a comma
-                    body = _("The movies are {movies}.").format(movies=movies)
-
-            if soon_release_movies:
-                if len(soon_release_movies) == 1:
-                    # TRANSLATOR: {title} is the title of the movie that will have its release soon
-                    title = _("{title} will have its release soon!").format(
-                        title=soon_release_movies[0].title)
-                    # TRANSLATOR: {title} is the title of the movie and {days} the number of days
-                    body = N_("{title} will have its release in {days} day.", "{title} will have its release in {days} days.", soon_release_movies_span.days).format(
-                        title=soon_release_movies[0].title, days=soon_release_movies_span.days)
-                else:
-                    # TRANSLATOR: {num} is the number of movies
-                    title = _("{num} movies on your watchlist will have their releases soon")
-                    movies = ", ".join(soon.title for soon in soon_release_movies)
-                    # TRANSLATOR: {movies} will be list of all series affected seperated by a comma
-                    body = _("The movies are {movies}.").format(movies=movies)
-
-            notification = Gio.Notification.new(title)
-            notification.set_body(body)
-            self.app.send_notification(None, notification)
-        else:
-            count_movies = len(new_release_movies) + len(soon_release_movies)
-            count_series = len(
-                new_release_series) + len(soon_release_series) + len(out_of_production_series)
-            # TRANSLATOR: {num} is the number of affected items
-            title = _("{num} items of your watchlist have an update").format(
-                num=count_movies + count_series)
-
-            if count_movies > 0 and count_series > 0:
-                # TRANSLATOR: {count_movies} is the number of movies
-                movie = N_("These updates affect {count_movies} movie", "These updates affect {count_movies} movies", count_movies)
-                # TRANSLATOR: the connector between the two parts of the sentence (foo and bar)
-                connector = _(" and ")
-                # TRANSLATOR: {count_series} is the number of series
-                series = N_(" {count_series} TV serie", " {count_series} TV series", count_series)
-                
-                body = f"{movie}{connector}{series}."
-            elif count_movies > 0:
-                # TRANSLATOR: {count_movies} is the number of movies
-                body = N_("These updates affect {count_movies} movie", "These updates affect {count_movies} movies", count_movies)
-            elif count_series > 0:
-                # TRANSLATOR: {count_series} is the number of series
-                body = N_("These updates affect {count_series} TV serie", "These updates affect {count_series} TV series", count_series)
-
-            notification = Gio.Notification.new(title)
-            notification.set_body(body)
-            self.app.send_notification(None, notification)
+        # TMDB updates removed - notification list feature no longer supported
+        logging.info('Automatic TMDB notification updates no longer supported')
+        return
 
     def _on_notification_list_done(self,
                                    source: GObject.Object,
