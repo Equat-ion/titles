@@ -1,0 +1,183 @@
+// Copyright (C) 2023 Alessandro Iepure
+// 
+// SPDX-License-Identifier: GPL-3.0-or-later
+using Gtk 4.0;
+using Adw 1;
+
+template $ContentView: Adw.Bin {
+  Adw.ViewStack _stack {
+    Adw.ViewStackPage {
+      name: "empty";
+
+      child: Adw.StatusPage {
+        icon-name: bind template.icon-name;
+        title: _("Your Watchlist Is Empty");
+        description: _("Add content with the + button or import from an older watchlist.");
+      };
+    }
+
+    Adw.ViewStackPage {
+      name: "updating";
+
+      child: Adw.StatusPage {
+        child: Box {
+          orientation: vertical;
+
+          Adw.Spinner {
+            height-request: 64;
+          }
+
+          Box {
+            orientation: vertical;
+            margin-start: 12;
+            margin-end: 12;
+
+            Label {
+              label: "Updating your watchlist…";
+              wrap: true;
+              halign: center;
+              justify: center;
+
+              styles [
+                "title-1"
+              ]
+            }
+
+            Label _updating_status_lbl {
+              halign: center;
+              justify: center;
+              wrap: true;
+            }
+          }
+        };
+      };
+    }
+
+    Adw.ViewStackPage {
+      name: "loading";
+
+      child: Adw.StatusPage {
+        child: Box {
+          orientation: vertical;
+
+          Adw.Spinner {
+            height-request: 64;
+          }
+
+          Box {
+            orientation: vertical;
+            margin-start: 12;
+            margin-end: 12;
+
+            Label _heading_lbl {
+              label: "Loading your watchlist…";
+              wrap: true;
+              halign: center;
+              justify: center;
+
+              styles [
+                "title-1"
+              ]
+            }
+
+            Label _status_lbl {
+              label: "Get your popcorns ready";
+              halign: center;
+              justify: center;
+              wrap: true;
+            }
+          }
+        };
+      };
+    }
+
+    Adw.ViewStackPage {
+      name: "filled";
+
+      child: ScrolledWindow {
+        Box {
+          orientation: vertical;
+
+          Box _full_box {
+            visible: false;
+            orientation: vertical;
+            spacing: 12;
+            halign: start;
+
+            Label _title_lbl {
+              halign: start;
+              margin-start: 12;
+              margin-top: 12;
+              label: _("Your Watchlist");
+
+              styles [
+                "title-1"
+              ]
+            }
+
+            FlowBox _flow_box {
+              orientation: horizontal;
+              min-children-per-line: 2;
+              max-children-per-line: 15;
+              selection-mode: none;
+              halign: start;
+            }
+          }
+
+          Box _separated_box {
+            visible: false;
+            orientation: vertical;
+            spacing: 12;
+            halign: start;
+
+            Box _unwatched_box {
+              orientation: vertical;
+
+              Label {
+                halign: start;
+                margin-start: 12;
+                margin-top: 12;
+                label: _("Unwatched");
+
+                styles [
+                  "title-1"
+                ]
+              }
+
+              FlowBox _unwatched_flow_box {
+                orientation: horizontal;
+                min-children-per-line: 2;
+                max-children-per-line: 15;
+                selection-mode: none;
+                halign: start;
+              }
+            }
+
+            Box _watched_box {
+              orientation: vertical;
+
+              Label {
+                halign: start;
+                margin-start: 12;
+                margin-top: 12;
+                label: _("Watched");
+
+                styles [
+                  "title-1"
+                ]
+              }
+
+              FlowBox _watched_flow_box {
+                orientation: horizontal;
+                min-children-per-line: 2;
+                max-children-per-line: 15;
+                selection-mode: none;
+                halign: start;
+              }
+            }
+          }
+        }
+      };
+    }
+  }
+}

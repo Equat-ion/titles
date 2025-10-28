@@ -1,0 +1,15 @@
+# Copyright (C) 2023 Alessandro Iepure
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[Desktop Entry]
+# TRANSLATORS: do not translate
+Name=@app_name@
+Exec=ticketbooth
+Icon=@app_id@
+Terminal=false
+Type=Application
+Categories=AudioVideo;Video;TV;Utility;
+Keywords=Movies;Films;Shows;TV;Series;Anime;Watch;List;Library;
+StartupNotify=true
+X-GNOME-UsesNotifications=true

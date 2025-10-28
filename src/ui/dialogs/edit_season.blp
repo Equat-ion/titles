@@ -1,0 +1,80 @@
+// Copyright (C) 2022 - 2023 Alessandro Iepure
+// 
+// SPDX-License-Identifier: GPL-3.0-or-later
+using Gtk 4.0;
+using Adw 1;
+
+template $EditSeasonDialog: Adw.Dialog {
+  content-width: 600;
+  content-height: 640;
+  map => $_on_map();
+
+  Adw.NavigationView _navigation_view {
+    Adw.NavigationPage {
+      title: _("Edit Season");
+
+      child: Adw.ToolbarView {
+        [top]
+        Adw.HeaderBar {
+          show-end-title-buttons: false;
+          show-start-title-buttons: false;
+
+          [start]
+          Button _cancel_btn {
+            label: _("Cancel");
+            action-name: 'window.close';
+          }
+
+          [end]
+          Button _save_btn {
+            label: _("Save");
+            sensitive: false;
+            clicked => $_on_save_btn_clicked();
+
+            styles [
+              "suggested-action"
+            ]
+          }
+        }
+
+        content: ScrolledWindow {
+
+          Box {
+            orientation: vertical;
+            margin-start: 20;
+            margin-end: 20;
+            margin-bottom: 20;
+
+            $ImageSelector _poster {}
+
+            Adw.PreferencesGroup {
+              margin-bottom: 20;
+              title: _("General");
+
+              Adw.EntryRow _title_entry {
+                title: _("Title (required)");
+                changed => $_on_title_entry_changed();
+              }
+            }
+
+            Adw.PreferencesGroup _episodes_group {
+              title: _("Episodes (required)");
+              description: _("Use the + button to add episodes");
+
+              [header-suffix]
+              Button {
+                Adw.ButtonContent {
+                  label: _("Add");
+                  icon-name: "plus";
+                }
+
+                clicked => $_on_add_btn_clicked();
+                styles ["accent"]
+              }
+            }
+          }
+        };
+      };
+    }
+  }
+}

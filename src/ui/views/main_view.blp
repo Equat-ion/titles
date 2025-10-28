@@ -1,0 +1,260 @@
+// Copyright (C) 2023 Alessandro Iepure
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+using Gtk 4.0;
+using Adw 1;
+
+template $MainView: Adw.Bin {
+
+  map => $_on_map();
+
+  ShortcutController {
+    scope: global;
+
+    Shortcut {
+      trigger: "<control>n";
+      action: "action(win.add-tmdb)";
+    }
+
+    Shortcut {
+      trigger: "<control><shift>n";
+      action: "action(win.add-manual)";
+    }
+
+    Shortcut {
+      trigger: "F5";
+      action: "action(win.refresh)";
+    }
+
+    Shortcut {
+      trigger: "<control>r";
+      action: "action(win.refresh)";
+    }
+
+    Shortcut {
+      trigger: "<control>f";
+      action: "action(win.search)";
+    }
+  }
+
+  Adw.NavigationView {
+    Adw.NavigationPage {
+      title: "Ticket Booth";
+      child: Adw.BreakpointBin {
+        width-request: 400;
+        height-request: 600;
+
+        Adw.Breakpoint {
+          condition("max-width: 550sp")
+          setters {
+            _header_bar.title-widget: null;
+            _switcher_bar.reveal: true;
+            _search_entry.width-request: -1;
+          }
+        }
+
+        child: Adw.ToolbarView {
+
+          [top]
+          Adw.HeaderBar _header_bar {
+            title-widget: Adw.InlineViewSwitcher _title {
+              stack: _tab_stack;
+              display-mode: both;
+            };
+
+            [start]
+            MenuButton _add_btn {
+              icon-name: "plus";
+              tooltip-text: _("Add a title to your library");
+              menu-model: _add_menu;
+            }
+
+            [start]
+            ToggleButton _show_search_btn {
+              icon-name: "loupe";
+              tooltip-text: _("Show/Hide search bar");
+              toggled => $_on_search_btn_toggled();
+            }
+
+            [end]
+            MenuButton _menu_btn {
+              icon-name: "open-menu";
+              menu-model: _primary_menu;
+              tooltip-text: _("Main Menu");
+            }
+
+            [end]
+            $BackgroundIndicator _background_indicator {
+              visible: true;
+            }
+          }
+
+          [top]
+          SearchBar _search_bar {
+            search-mode-enabled: bind _show_search_btn.active;
+            styles ["inline"]
+
+            child: Box {
+              orientation: horizontal;
+              spacing: 6;
+
+              DropDown _search_mode {
+                model: StringList {
+                  strings [
+                    C_("Search mode", "Title"), 
+                    C_("Search mode", "Genre"), 
+                    C_("Search mode", "Overview"), 
+                    C_("Search mode", "Notes"), 
+                    C_("Search mode", "TMDB ID")
+                  ]
+                };
+                selected: 0;      
+              }
+
+              SearchEntry _search_entry {
+                halign: center;
+                width-request: 430;
+                activates-default: true;
+                placeholder-text: _("Search Your Watchlist");
+                search-delay: 500;
+                search-changed => $_on_searchentry_search_changed();
+              }
+            };
+          }
+
+          content: Box {
+            orientation: vertical;
+
+            Adw.Banner _banner {
+              title: _("Offline Mode Enabled");
+              button-label: _("Preferences");
+              action-name: "app.preferences";
+            }
+
+            Adw.ViewStack _tab_stack {
+              vexpand: true;
+              hexpand: true;
+            }
+          };
+
+          [bottom]
+          Adw.ViewSwitcherBar _switcher_bar {
+            stack: _tab_stack;
+          }
+        };
+      };
+    }
+  }
+}
+
+menu _primary_menu {
+
+  section {
+    item {
+      custom: "themeswitcher";
+    }
+  }
+
+  section {
+    submenu {
+      label: _("_Sorting");
+
+      section {
+        item {
+          label: _("A-Z");
+          action: "win.view-sorting";
+          target: "az";
+        }
+
+        item {
+          label: _("Z-A");
+          action: "win.view-sorting";
+          target: "za";
+        }
+
+        item {
+          label: _("Date added (newest first)");
+          action: "win.view-sorting";
+          target: "added-date-new";
+        }
+
+        item {
+          label: _("Date added (oldest first)");
+          action: "win.view-sorting";
+          target: "added-date-old";
+        }
+
+        item {
+          label: _("Release date (newest first)");
+          action: "win.view-sorting";
+          target: "released-date-new";
+        }
+
+        item {
+          label: _("Release date (oldest first)");
+          action: "win.view-sorting";
+          target: "released-date-old";
+        }
+      }
+
+      section {
+        item {
+          label: _("Separate watched from unwatched");
+          action: 'win.separate-watched';
+        }
+
+        item {
+          label: _("Hide watched");
+          action: 'win.hide-watched';
+        }
+      }
+    }
+
+    item {
+      label: _("_Refresh");
+      action: "win.refresh";
+    }
+  }
+
+  section {
+    item {
+      label: _("_Import");
+      action: "app.import";
+    }
+
+    item {
+      label: _("_Export");
+      action: "app.export";
+    }
+  }
+
+  section {
+    item {
+      label: _("_Preferences");
+      action: "app.preferences";
+    }
+
+    item {
+      label: _("_Keyboard Shortcuts");
+      action: "win.show-help-overlay";
+    }
+
+    item {
+      label: _("_About Ticket Booth");
+      action: "app.about";
+    }
+  }
+}
+
+menu _add_menu {
+  item {
+    label: _("From The Movie Database (TMDB)");
+    action: "win.add-tmdb";
+  }
+
+  item {
+    label: _("Manually");
+    action: "win.add-manual";
+  }
+}

@@ -1,0 +1,682 @@
+# Copyright (C) 2023 Alessandro Iepure
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+import logging
+import os
+import shutil
+from datetime import date, datetime
+from gettext import gettext as _
+from gettext import pgettext as C_
+from typing import List, Tuple
+from urllib.parse import unquote
+from PIL import Image, ImageStat
+from pathlib import Path
+
+from gi.repository import Adw, Gio, GLib, GObject, Gtk
+
+from .. import shared  # type: ignore
+from ..background_queue import (ActivityType, BackgroundActivity,
+                                BackgroundQueue)
+from ..dialogs.edit_season_dialog import EditSeasonDialog
+from ..models.episode_model import EpisodeModel
+from ..models.language_model import LanguageModel
+from ..models.movie_model import MovieModel
+from ..models.season_model import SeasonModel
+from ..models.series_model import SeriesModel
+from ..providers.local_provider import LocalProvider as local
+from ..widgets.season_expander import SeasonExpander
+
+
+@Gtk.Template(resource_path=shared.PREFIX + '/ui/dialogs/add_manual.ui')
+class AddManualDialog(Adw.Dialog):
+    """
+    This class represents the dialog to manually add content to the db.
+
+    Properties:
+        edit_mode (bool): whether or not the window is in add/edit mode
+
+    Methods:
+        update_seasons_ui(): rebuilds the ui to reflect changes to seasons
+        get_season(title: str, poster: str, episodes: list): returns the tuple with the provided data or an empty tuple
+
+    Signals:
+        edit-saved(SeriesModel or MovieModel): emited when the user clicks the save button
+    """
+
+    __gtype_name__ = 'AddManualDialog'
+
+    edit_mode = GObject.Property(type=bool, default=False)
+
+    _toggle_group = Gtk.Template.Child()
+    _movies_btn = Gtk.Template.Child()
+    _series_btn = Gtk.Template.Child()
+    _save_btn = Gtk.Template.Child()
+    _poster = Gtk.Template.Child()
+    _title_entry = Gtk.Template.Child()
+    _release_date_menu_btn = Gtk.Template.Child()
+    _calendar = Gtk.Template.Child()
+    _genres_entry = Gtk.Template.Child()
+    _runtime_spinrow = Gtk.Template.Child()
+    _tagline_entry = Gtk.Template.Child()
+    _creator_entry = Gtk.Template.Child()
+    _overview_text = Gtk.Template.Child()
+    _seasons_group = Gtk.Template.Child()
+    _status_entry = Gtk.Template.Child()
+    _original_language_comborow = Gtk.Template.Child()
+    _language_model = Gtk.Template.Child()
+    _original_title_entry = Gtk.Template.Child()
+    _budget_spinrow = Gtk.Template.Child()
+    _revenue_spinrow = Gtk.Template.Child()
+    _production_checkbtn = Gtk.Template.Child()
+
+    __gsignals__ = {
+        'edit-saved': (GObject.SIGNAL_RUN_FIRST, None, (object,)),
+    }
+
+    seasons: list = []
+
+    def __init__(self,
+                 edit_mode: bool = False,
+                 content: MovieModel | SeasonModel | None = None
+                 ):
+        super().__init__()
+
+        self.edit_mode = edit_mode
+        self._content = content
+
+        logging.info(f'Edit mode: {self.edit_mode}')
+        if edit_mode and type(self._content) is MovieModel:
+            self.set_title(_('Edit Movie'))
+            logging.debug(f'Editing [Movie] {self._content.title}')
+        elif edit_mode and type(self._content) is SeriesModel:
+            self.set_title(_('Edit TV Series'))
+            logging.debug(f'Editing [TV Series] {self._content.title}')
+
+    @Gtk.Template.Callback('_on_map')
+    def _on_map(self, user_data: object | None) -> None:
+        """
+        Callback for the "map" signal.
+        Setup the window by selecting the initial view (movies or tv series), the image for the poster and populates the language dropdown and the selected date for the release.
+
+        Args:
+            user_data (object or None): user data passed to the callback.
+
+        Returns:
+            None
+        """
+
+        self._overview_text.remove_css_class('view')
+
+        languages = local.get_all_languages()
+        # move 'no language' to 1st place
+        languages.insert(0, languages.pop(len(languages)-6))
+        for language in languages:
+            self._language_model.append(language.name)
+
+        self._poster.set_blank_image(
+            f'resource://{shared.PREFIX}/blank_poster.jpg')
+
+        if not self._content:
+            if shared.schema.get_string('win-tab') == 'movies':
+                self._toggle_group.set_active(0)
+            else:
+                self._toggle_group.set_active(1)
+
+            self._release_date_menu_btn.set_label(
+                self._calendar.get_date().format('%x'))
+            return
+
+        # Both Movies and TV Series
+        self._poster.set_image(self._content.poster_path)
+        self._title_entry.set_text(self._content.title)
+        self._title_entry.grab_focus()
+        self._release_date_menu_btn.set_label(
+            date.fromisoformat(self._content.release_date).strftime('%x'))
+        self._calendar.select_day(GLib.DateTime.new_from_iso8601(
+            datetime.fromisoformat(self._content.release_date).isoformat()+'Z'))
+        self._genres_entry.set_text(', '.join(self._content.genres))
+        self._tagline_entry.set_text(self._content.tagline)
+        self._overview_text.get_buffer().set_text(self._content.overview, -1)
+        self._status_entry.set_text(self._content.status)
+        self._original_language_comborow.set_selected(
+            self._get_selected_language_index(self._content.original_language))
+        self._original_title_entry.set_text(self._content.original_title)
+
+        # Movies specific
+        if type(self._content) is MovieModel:
+            self._movies_btn.set_active(True)
+            self._runtime_spinrow.set_value(self._content.runtime)
+            self._budget_spinrow.set_value(self._content.budget)
+            self._revenue_spinrow.set_value(self._content.revenue)
+
+        # TV Series specific
+        if type(self._content) is SeriesModel:
+            self._series_btn.set_active(True)
+            self._creator_entry.set_text(','.join(self._content.created_by))
+            self._production_checkbtn.set_active(self._content.in_production)
+            self.seasons = self._parse_seasons(self._content.seasons)
+            self.update_seasons_ui()
+
+    def _parse_seasons(self, seasons_as_model: List[SeasonModel]) -> List[tuple]:
+        """
+        Parse seasons passed as a list of SeasonModels into a list of tuples.
+
+        Args:
+            seasons_as_model(List[SeasonModel]): a list of SeasonModels
+
+        Returns:
+            a list of tuples representing the same data
+        """
+
+        seasons_as_tuple = []
+        for season in seasons_as_model:
+
+            episodes_as_tuple = []
+            for episode in season.episodes:
+                episodes_as_tuple.append((
+                    episode.title,
+                    episode.number,
+                    episode.runtime,
+                    episode.overview,
+                    episode.still_path,
+                    episode.watched,
+                    episode.id
+                ))
+
+            seasons_as_tuple.append((
+                season.title,
+                season.poster_path,
+                episodes_as_tuple
+            ))
+        return seasons_as_tuple
+
+    def _get_selected_language_index(self, language: LanguageModel) -> int:
+        """
+        Loops languages looking for the index of the provided language.
+
+        Args:
+            language (LanguageModel): language to look for
+
+        Returns:
+            index (int)
+        """
+
+        for idx in range(0, self._language_model.get_n_items()):
+            if language.name == self._language_model.get_string(idx):
+                return idx
+        return -1
+
+    @Gtk.Template.Callback('_on_title_changed')
+    def _on_title_changed(self, user_data: object | None) -> None:
+        """
+        Callback for "changed" signal.
+        Wrapper around self._enable_save_btn().
+
+        Args:
+            user_data (object or None): user data passed to the callback.
+
+        Returns:
+            None
+        """
+
+        self._enable_save_btn()
+
+    @Gtk.Template.Callback()
+    def _on_toggle_group_changed(self, pspec: GObject.ParamSpec, user_data: object | None) -> None:
+        """
+        Callback for "notify::active" signal.
+        Wrapper around self._enable_save_btn().
+
+        Args:
+            pspec (GObject.ParamSpec): the property spec
+            user_data (object or None): user data passed to the callback.
+
+        Returns:
+            None
+        """
+
+        self._enable_save_btn()
+
+    def _enable_save_btn(self) -> None:
+        """
+        Checks whether the "save" button should be active or not.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Movies: title required
+        if self._toggle_group.get_active_name() == "movies" and self._title_entry.get_text():
+            self._save_btn.set_sensitive(True)
+            return
+
+        # TV Series: title and at least a season required
+        if self._toggle_group.get_active_name() == "series" and self._title_entry.get_text() and len(self.seasons) > 0:
+            self._save_btn.set_sensitive(True)
+            return
+
+        self._save_btn.set_sensitive(False)
+
+    @Gtk.Template.Callback('_on_calendar_day_selected')
+    def _on_calendar_day_selected(self, user_data: object | None) -> None:
+        """
+        Callback for the "day-selected" signal.
+        Sets the button's label as the selected date (user locale format)
+
+        Args:
+            user_data (object or None): user data passed to the callback.
+
+        Returns:
+            None
+        """
+
+        self._release_date_menu_btn.set_label(
+            self._calendar.get_date().format('%x'))
+
+    @Gtk.Template.Callback('_on_season_add_btn_clicked')
+    def _on_season_add_btn_clicked(self, user_data: object | None) -> None:
+        """
+        Callback for the "clicked" signal.
+        Opens the "edit season" dialog.
+
+        Args:
+            user_data (object or None): user data passed to the callback.
+
+        Returns:
+            None
+        """
+
+        # TRANSLATORS: {num} is the season number
+        logging.debug('Edit season dialog open')
+        dialog = EditSeasonDialog(self, title=_(
+            'Season {num}').format(num=len(self.seasons)+1))
+        dialog.connect('edit-saved', self._on_edit_saved)
+        dialog.present(dialog.parent)
+
+    def _on_edit_saved(self, source: Gtk.Widget, title: str, poster_uri: str, episodes: List[tuple]) -> None:
+        """
+        Callback for the "edit-saved" signal.
+        Appends the recieved data as a tuple in the seasons list and updates the ui.
+
+        Args:
+            source (Gtk.Widget): caller widget
+            title (str): season title
+            poster_uri (str): season poster uri
+            episodes (List[tuple]): season episodes
+
+        Returns:
+            None
+        """
+
+        logging.info(f'Updated {title}, {poster_uri}, {episodes}')
+        self.seasons.append((title, poster_uri, episodes))
+        self.update_seasons_ui()
+
+    @Gtk.Template.Callback('_on_done_btn_clicked')
+    def _on_done_btn_clicked(self, user_data: object | None) -> None:
+        """
+        Callback for the "clicked" signal.
+        Adds a background activity to add/update the content and closes the window.
+
+        Args:
+            user_data (object or None): user data passed to the callback.
+
+        Returns:
+            None
+        """
+
+        if not self.edit_mode:
+            BackgroundQueue.add(
+                activity=BackgroundActivity(  # TRANSLATORS: {title} is the content's title
+                    activity_type=ActivityType.ADD,
+                    title=C_('Background activity title', 'Add {title}').format(title=self._title_entry.get_text()), task_function=self._add_content_to_db),
+                on_done=self._on_add_done)
+        else:
+            BackgroundQueue.add(
+                activity=BackgroundActivity(  # TRANSLATORS: {title} is the content's title
+                    activity_type=ActivityType.UPDATE,
+                    title=C_('Background activity title', 'Update {title}').format(title=self._title_entry.get_text()), task_function=self._add_content_to_db),
+                on_done=self._on_add_done)
+
+        self.close()
+
+    def _add_content_to_db(self, activity: BackgroundActivity) -> None:
+        """
+        Copies the poster image to the data folder, saves the content, and refreshes the main window.
+
+        Args:
+            activity (BackgroundActivity): the calling activity
+
+        Returns:
+            None
+        """
+        
+       
+        poster_uri, color = self._copy_image_to_data(self._poster.get_uri(),
+                                              shared.poster_dir,
+                                              self._title_entry.get_text()
+                                              ) if not self.edit_mode else (self._content.poster_path, False)  # type: ignore
+        if self._toggle_group.get_active_name() == "movies":
+            self._save_movie(poster_uri, color)
+        else:
+            self._save_series(poster_uri, color)
+
+    def _on_add_done(self,
+                     source: GObject.Object,
+                     result: Gio.AsyncResult,
+                     cancellable: Gio.Cancellable,
+                     activity: BackgroundActivity):
+        """Callback to complete async activity"""
+
+        self.get_ancestor(Adw.ApplicationWindow).activate_action('win.refresh', None)
+        activity.end()
+
+    def _save_movie(self, poster_uri: str, color: bool) -> None:
+        """
+        Creates a MovieModel with the provided data and saves or updates the movie in the local db.
+
+        Args:
+            poster_uri (str): movie poster uri
+
+        Returns:
+            None
+        """
+
+        buffer = self._overview_text.get_buffer()
+        start_iter = buffer.get_start_iter()
+        end_iter = buffer.get_end_iter()
+        overview = buffer.get_text(start_iter, end_iter, False)
+
+        movie = MovieModel(t={
+            "add_date": datetime.now(),  # add date
+            "backdrop_path": '',  # background
+            "budget":int(self._budget_spinrow.get_value()),  # budget
+            "color": color,
+            "genres": ''.join(self._genres_entry.get_text().split()),  # genres
+            "id": local.get_next_manual_movie() if not self.edit_mode else self._content.id,  # id
+            "manual":True,   # manual
+            "original_language":local.get_language_by_name(self._original_language_comborow.get_selected_item(
+            ).get_string()).iso_name,  # original language
+            "original_title": self._original_title_entry.get_text(),  # original title
+            "overview":overview,   # overview
+            "poster_path": poster_uri,  # poster
+            "release_date": self._calendar.get_date().format('%Y-%m-%d'),   # release date
+            "revenue":int(self._revenue_spinrow.get_value()),  # revenue
+            "runtime":int(self._runtime_spinrow.get_value()),  # runtime
+            "status":self._status_entry.get_text(),  # status
+            "tagline":self._tagline_entry.get_text(),  # tagline
+            "title":self._title_entry.get_text(),   # title
+            "watched": False if not self.edit_mode else self._content.watched,  # watched
+            "activate_notification": False,  # activate notification
+            "new_release": False,  # new release flag
+            "soon_release": False,  # soon release flag
+            "last_watched": datetime.now(),  # last watched
+            "notes": '',  # notes
+            "recent_change": False  # recent change flag
+        })
+
+        if not self.edit_mode:
+            local.add_movie(movie=movie)
+        else:
+            local.update_movie(old=self._content, new=movie)
+            self.emit('edit-saved', movie)
+
+    def _save_series(self, series_poster_uri: str, color: bool) -> None:
+        """
+        Creates a SeriesModel with associated SeasonModels/EpisodeModels with the provided data and saves or updates the TV series in the local db.
+
+        Args:
+            poster_uri (str): tv series poster uri
+
+        Returns:
+            None
+        """
+
+        show_id = local.get_next_manual_series()
+        base_season_id = local.get_next_manual_season()
+        base_episode_id = local.get_next_manual_episode()
+
+        seasons = []
+        for idx, season in enumerate(self.seasons):
+
+            # Create folder to store the images, if needed
+            if not os.path.exists(f"{shared.series_dir}/{show_id}/{self._increment_manual_id(base_season_id, idx)}"):
+                os.makedirs(
+                    f"{shared.series_dir}/{show_id}/{self._increment_manual_id(base_season_id, idx)}")
+
+            # Copy the season poster
+            poster_uri, color = self._copy_image_to_data(season[1],
+                                                  f"{shared.series_dir}/{show_id}/{self._increment_manual_id(base_season_id, idx)}",
+                                                  season[0])
+
+            episodes = []
+            for jdx, episode in enumerate(season[2]):
+
+                # Copy the episode still
+                still_uri, color = self._copy_image_to_data(episode[4],
+                                                     f"{shared.series_dir}/{show_id}/{self._increment_manual_id(base_season_id, idx)}",
+                                                     episode[0]
+                                                     )
+                episode_id = self._increment_manual_id(base_episode_id, jdx)
+                season_number = idx+1
+                watched = False
+
+                episodes.append(EpisodeModel(t=(
+                    episode_id,     # id
+                    episode[1],     # episode number
+                    episode[3],     # overview
+                    episode[2],     # runtime
+                    season_number,  # season number
+                    show_id,        # show id
+                    still_uri,      # still uri
+                    episode[0],     # title
+                    watched         # watched
+                )))
+
+            base_episode_id = self._increment_manual_id(
+                base_episode_id, len(episodes)+1)
+            season_id = self._increment_manual_id(base_season_id, idx)
+            season_number = idx+1
+
+            seasons.append(SeasonModel(t=(
+                len(episodes),  # episodes number
+                season_id,      # id
+                season_number,  # season number
+                '',             # overview
+                poster_uri,     # season poster
+                season[0],      # title
+                show_id,        # show id
+                episodes        # season episodes
+            )))
+
+        buffer = self._overview_text.get_buffer()
+        start_iter = buffer.get_start_iter()
+        end_iter = buffer.get_end_iter()
+        overview = buffer.get_text(start_iter, end_iter, False)
+
+        serie = SeriesModel(t={
+            "activate_notification": False,                                   # activate notification        
+            "add_date": datetime.now(),                                       # add date
+            "backdrop_path":'',                                               # backgroud
+            "color": color,                                       # color
+            "created_by": self._creator_entry.get_text(),                     # created by
+            "episodes_number": self._compute_episode_number(seasons),         # episode number
+            "genres": ''.join(self._genres_entry.get_text().split()),         # genres
+            "id": show_id,                                                    # id
+            "in_production": self._production_checkbtn.get_active(),          # in production
+            "last_air_date": '',                                              # last air date
+            "manual": True,                                                   # manual
+            "new_release": False,                                             # new release flag
+            "next_air_date": '',                                              # next air date           
+            "original_language": local.get_language_by_name(self._original_language_comborow.get_selected_item(
+            ).get_string()).iso_name,         # type: ignore                  # original language
+            "original_title": self._original_title_entry.get_text(),          # original title
+            "overview": overview,                                             # overview
+            "poster_path": series_poster_uri,                                 # poster
+            "release_date": self._calendar.get_date().format('%Y-%m-%d'),     # release date
+            "seasons_number": len(seasons),                                   # seasons number
+            "soon_release" :False,                                            # soon_release flag      
+            "status": self._status_entry.get_text(),                          # status
+            "tagline": self._tagline_entry.get_text(),                        # tagline
+            "title": self._title_entry.get_text(),                            # title
+            "watched": False,                                                 # watched
+            "last_episode_number": 0,                                         # last episode number
+            "recent_change": False,                                           # recent change flag
+            "notes": '',                                                      # notes
+            "seasons": seasons                                                # seasons
+    })
+
+        if self.edit_mode:
+            local.delete_series(self._content.id)   # type: ignore
+            local.add_series(serie=serie)
+            self.emit('edit-saved', serie)
+        else:
+            local.add_series(serie=serie)
+
+    def _increment_manual_id(self, id: str, amount: int = 1) -> str:
+        """
+        Increments the integer part of a manual id by amount.
+
+        Args:
+            id (str): id to increment
+            amount (int): how much to increment by
+
+        Returns:
+            the incremented id
+        """
+
+        tmp = id.split('-')
+        return f'M-{int(tmp[1]) + amount}'
+
+    def _compute_badge_color(self, poster_path) -> bool:
+
+        im = Image.open(poster_path)
+        box = (im.size[0]-175, 0, im.size[0], 175)
+        region = im.crop(box)
+        median = ImageStat.Stat(region).median
+        if sum(median) < 3 * 128:
+            return True
+        else:
+            return False
+
+    def _compute_episode_number(self, seasons: List[SeasonModel]) -> int:
+        """
+        Counts the total number of episodes of a tv series.
+
+        Args:
+            seasons (List[SeasonModel]): seasons to loop on
+
+        Returns:
+            the total number of episodes
+        """
+
+        num = 0
+        for season in seasons:
+            for episode in season.episodes:
+                num += 1
+        return num
+
+    def _copy_image_to_data(self, src_uri: str, dest_folder: str, filename: str) -> Tuple[str,bool]:
+        """
+        Copies src_uri to dest_folder as filename. If src_uri is a resource (empty poster/still) the operation is not
+        carried out.
+        dest_folder must already exist on file system.
+
+        Args:
+            src_uri (str): source file uri
+            dest_folder (str): path to the destination folder
+            filename (str): new name for the copied file
+
+        Returns:
+            uri of the copied file or src_uri if is a resource.
+        """
+        
+        if src_uri.startswith('file'):
+            extension = src_uri[src_uri.rindex('.'):]
+            dest_path = f"{dest_folder}/{unquote(filename)}{extension}"
+            shutil.copy2(src_uri[7:], dest_path)
+            return f"file://{dest_path}", self._compute_badge_color(Path(dest_path))
+        return src_uri, False
+
+    def update_seasons_ui(self) -> None:
+        """
+        Rebuilds the ui to reflect changes to seasons.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        # Empty PreferencesGroup
+        list_box = self._seasons_group.get_first_child(
+        ).get_last_child().get_first_child()  # ugly workaround
+        list_box.remove_all()
+
+        # Fill PreferencesGroup
+        for season in self.seasons:
+            self._seasons_group.add(SeasonExpander(
+                season_title=season[0], poster_uri=season[1], episodes=season[2]))
+
+        self._enable_save_btn()
+
+    def get_season(self,
+                   title: str,
+                   uri: str,
+                   episodes: List[tuple]) -> tuple:
+        """
+        Compares and retrieves the tuple containing the passed data.
+
+        Args:
+            title (str): a title
+            uri (str): an uri
+            episodes (List[tuple]): a list of tuples representing episodes
+
+        Returns:
+            tuple matching the passed data
+        """
+
+        for season in self.seasons:
+            if (season[0] == title and
+                season[1] == uri and
+                    season[2] == episodes):
+                return season
+        return ()
+
+    @Gtk.Template.Callback()
+    def _show_for_movies(self, source: Gtk.Widget, active_name: str) -> bool:
+        """
+        Closure to show movie specific widgets.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        if active_name == "movie":
+            return True
+        return False
+    
+    @Gtk.Template.Callback()
+    def _show_for_series(self, source: Gtk.Widget, active_name: str) -> bool:
+        """
+        Closure to show series specific widgets.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
+        if active_name == "series":
+            return True
+        return False
+    

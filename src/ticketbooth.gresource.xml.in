@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Copyright (C) 2023 Alessandro Iepure
+
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+
+<gresources>
+
+  <gresource prefix="@prefix@">
+
+    <!-- Stylesheets -->
+    <file alias="style.css">css/style.css</file>
+    <file alias="style-dark.css">css/style-dark.css</file>
+    <!-- <file alias="style-hc.css">css/style-hc.css</file>
+    <file alias="style-dark-hc.css">css/style-dark-hc.css</file> -->
+
+    <!-- Widgets -->
+    <file preprocess="xml-stripblanks">ui/widgets/theme_switcher.ui</file>
+    <file preprocess="xml-stripblanks">ui/widgets/poster_button.ui</file>
+    <file preprocess="xml-stripblanks">ui/widgets/search_result_row.ui</file>
+    <file preprocess="xml-stripblanks">ui/widgets/episode_row.ui</file>
+    <file preprocess="xml-stripblanks">ui/widgets/image_selector.ui</file>
+    <file preprocess="xml-stripblanks">ui/widgets/season_expander.ui</file>
+    <file preprocess="xml-stripblanks">ui/widgets/background_indicator.ui</file>
+    <file preprocess="xml-stripblanks">ui/widgets/background_activity_row.ui</file>
+
+    <!-- Dialogs -->
+    <file preprocess="xml-stripblanks">ui/dialogs/add_manual.ui</file>
+    <file preprocess="xml-stripblanks">ui/dialogs/add_tmdb.ui</file>
+    <file preprocess="xml-stripblanks">ui/dialogs/edit_season.ui</file>
+    <file preprocess="xml-stripblanks">ui/dialogs/message_dialogs.ui</file>
+
+    <!-- Views -->
+    <file preprocess="xml-stripblanks" alias="gtk/help-overlay.ui">ui/gtk/help-overlay.ui</file>
+    <file preprocess="xml-stripblanks">ui/window.ui</file>
+    <file preprocess="xml-stripblanks">ui/about_dialog.ui</file>
+    <file preprocess="xml-stripblanks">ui/preferences.ui</file>
+    <file preprocess="xml-stripblanks">ui/views/db_update_view.ui</file>
+    <file preprocess="xml-stripblanks">ui/views/first_run_view.ui</file>
+    <file preprocess="xml-stripblanks">ui/views/main_view.ui</file>
+    <file preprocess="xml-stripblanks">ui/views/content_view.ui</file>
+
+    <!-- Pages -->
+    <file preprocess="xml-stripblanks">ui/pages/details_page.ui</file>
+    <file preprocess="xml-stripblanks">ui/pages/edit_episode_page.ui</file>
+
+    <!-- Others -->
+    <file alias="blank_poster.jpg">../data/blank_poster.jpg</file>
+    <file alias="blank_still.jpg">../data/blank_still.jpg</file>
+  </gresource>
+
+  <gresource prefix="@prefix@/icons/scalable/actions">
+    <file preprocess="xml-stripblanks" alias="series-symbolic.svg">../data/icons/symbolic/series-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="bell-outline-symbolic.svg">../data/icons/symbolic/bell-outline-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="check-round-outline-symbolic.svg">../data/icons/symbolic/check-round-outline-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="movies-symbolic.svg">../data/icons/symbolic/movies-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="network-transmit-receive-symbolic.svg">../data/icons/symbolic/network-transmit-receive-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="view-grid-symbolic.svg">../data/icons/symbolic/view-grid-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="view-list-symbolic.svg">../data/icons/symbolic/view-list-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="loupe-symbolic.svg">../data/icons/symbolic/loupe-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="plus-symbolic.svg">../data/icons/symbolic/plus-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="document-edit-symbolic.svg">../data/icons/symbolic/document-edit-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="user-trash-symbolic.svg">../data/icons/symbolic/user-trash-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="check-plain-symbolic.svg">../data/icons/symbolic/check-plain-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="watchlist-symbolic.svg">../data/icons/symbolic/watchlist-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="star-large-symbolic.svg">../data/icons/symbolic/star-large-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="hourglass-symbolic.svg">../data/icons/symbolic/hourglass-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="right-symbolic.svg">../data/icons/symbolic/right-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="update-symbolic.svg">../data/icons/symbolic/update-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="warning-symbolic.svg">../data/icons/symbolic/warning-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="floppy-symbolic.svg">../data/icons/symbolic/floppy-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="bell-outline-none-symbolic.svg">../data/icons/symbolic/bell-outline-none-symbolic.svg</file>
+  </gresource>
+
+</gresources>

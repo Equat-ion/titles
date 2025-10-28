@@ -1,0 +1,95 @@
+// Copyright (C) 2023 Alessandro Iepure
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+using Gtk 4.0;
+using Adw 1;
+
+template $EpisodeRow: Adw.PreferencesRow {
+
+  map => $_on_map();
+
+  Box {
+    margin-bottom: 12;
+    margin-top: 12;
+    margin-start: 12;
+    margin-end: 12;
+    orientation: horizontal;
+    hexpand: true;
+    spacing: 24;
+
+    Picture _still_picture {
+      height-request: 100;
+      width-request: 56;
+      content-fit: fill;
+
+      styles ["still"]
+    }
+
+    Box {
+      orientation: vertical;
+      hexpand: true;
+
+      Label _title_lbl {
+        halign: start;
+        lines: 2;
+        wrap: true;
+
+        styles ["heading"]
+      }
+
+      Label _runtime_lbl {
+        halign: start;
+
+        styles ["dimmed"]
+      }
+
+      Label _overview {
+        margin-top: 3;
+        halign: start;
+        label: bind template.overview;
+        wrap: true;
+        lines: 3;
+        wrap-mode: word;
+        ellipsize: end;
+      }
+    }
+
+    Box {
+      visible: bind template.show-controls;
+
+      Button _watched_btn {
+        visible: bind template.editable inverted;
+        valign: center;
+
+        clicked => $_on_watched_btn_clicked();
+      }
+
+      Box {
+        styles ["linked"]
+
+        orientation: horizontal;
+        visible: bind template.editable;
+        halign: end;
+        hexpand: true;
+
+        Button _delete_btn {
+          valign: center;
+          icon-name: "user-trash-symbolic";
+
+          clicked => $_on_delete_btn_clicked();
+        }
+
+        Button _edit_btn {
+          valign: center;
+          child: Adw.ButtonContent {
+            icon-name: "document-edit";
+            label: _("Edit");
+          };
+
+          clicked => $_on_edit_btn_clicked();
+        }
+      }
+    }
+  }
+}

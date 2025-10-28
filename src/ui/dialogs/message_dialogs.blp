@@ -1,0 +1,43 @@
+// Copyright (C) 2022 - 2023 Alessandro Iepure
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+using Gtk 4.0;
+using Adw 1;
+
+Adw.AlertDialog _clear_cache_dialog {
+  heading: C_("message dialog heading", "Clear Cached Data?");
+  body: C_("message dialog body", "This operation will clear all stored cache data. It might get downloaded again next time you add content from TMDB.");
+
+  responses[
+    cache_cancel: C_("message dialog action", "Cancel"),
+    cache_clear: C_("message dialog action", "Clear") destructive
+  ]
+}
+
+Adw.AlertDialog _clear_data_dialog {
+  heading: C_("message dialog heading", "Clear Stored Data?");
+  body: C_("message dialog body", "This operation will permanentlly delete the selected data, loosing all your changes.");
+  extra-child: Adw.PreferencesGroup {
+    Adw.ActionRow _movies_row {
+      [prefix]
+      CheckButton _movies_checkbtn {}
+
+      title: _("Movies");
+      activatable-widget: _movies_checkbtn;
+    }
+
+    Adw.ActionRow _series_row {
+      [prefix]
+      CheckButton _series_checkbtn {}
+
+      title: _("TV Series");
+      activatable-widget: _series_checkbtn;
+    }
+  };
+
+  responses[
+    data_cancel: C_("message dialog action", "Cancel"),
+    data_clear: C_("message dialog action", "Clear") destructive
+  ]
+}

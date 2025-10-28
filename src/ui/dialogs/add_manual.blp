@@ -1,0 +1,234 @@
+// Copyright (C) 2022 - 2023 Alessandro Iepure
+// 
+// SPDX-License-Identifier: GPL-3.0-or-later
+using Gtk 4.0;
+using Adw 1;
+
+template $AddManualDialog: Adw.Dialog {
+  content-height: 670;
+  content-width: 650;
+  map => $_on_map();
+
+  Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {
+      show-end-title-buttons: false;
+      show-start-title-buttons: false;
+
+      title-widget: Box {
+        orientation: vertical;
+
+        Adw.WindowTitle {
+          valign: center;
+          vexpand: true;
+          visible: bind template.edit-mode;
+          title: bind template.title;
+        }
+
+        Box {
+          visible: bind template.edit-mode inverted;
+          orientation: horizontal;
+          valign: center;
+
+          styles [
+            "linked"
+          ]
+
+          Adw.ToggleGroup _toggle_group {
+            notify::active => $_on_toggle_group_changed();
+
+            Adw.Toggle _movies_btn {
+              name: "movies";
+              label: C_("Category", "Movie");
+            }
+
+            Adw.Toggle _series_btn {
+              name: "series";
+              label: C_("Category", "TV Series");
+            }
+          }
+        }
+      };
+
+      [start]
+      Button {
+        label: _("Cancel");
+        action-name: 'window.close';
+      }
+
+      [end]
+      Button _save_btn {
+        label: _("Save");
+        sensitive: false;
+        clicked => $_on_done_btn_clicked();
+
+        styles [
+          "suggested-action"
+        ]
+      }
+    }
+
+    content: ScrolledWindow {
+      vexpand: true;
+      hexpand: true;
+
+      Box {
+        orientation: vertical;
+        margin-start: 20;
+        margin-end: 20;
+        margin-bottom: 20;
+        margin-top: 20;
+
+        $ImageSelector _poster {}
+
+        Adw.PreferencesGroup {
+          margin-bottom: 20;
+          title: _("General");
+
+          Adw.EntryRow _title_entry {
+            title: _("Title (required)");
+            changed => $_on_title_changed();
+          }
+
+          Adw.ActionRow {
+            title: _("Release Date");
+            activatable-widget: _release_date_menu_btn;
+
+            MenuButton _release_date_menu_btn {
+              valign: center;
+
+              popover: Popover {
+                Calendar _calendar {
+                  day-selected => $_on_calendar_day_selected();
+                }
+              };
+
+              styles [
+                "flat"
+              ]
+            }
+          }
+
+          Adw.EntryRow _genres_entry {
+            title: _("Genres (comma separated)");
+          }
+
+          Adw.SpinRow _runtime_spinrow {
+            // visible: bind _movies_btn.active;
+            visible: bind $_show_for_movies(_toggle_group.active-name) as <bool>;
+            title: _("Runtime (minutes)");
+
+            adjustment: Adjustment {
+              lower: 0;
+              upper: 900;
+              step-increment: 1;
+            };
+          }
+
+          Adw.EntryRow _tagline_entry {
+            title: _("Tagline");
+          }
+
+          Adw.EntryRow _creator_entry {
+            // visible: bind _series_btn.active;
+            visible: bind $_show_for_series(_toggle_group.active-name) as <bool>;
+            title: _("Created by");
+          }
+        }
+
+        Adw.PreferencesGroup {
+          title: _("Overview");
+          margin-bottom: 20;
+
+          Gtk.TextView _overview_text {
+            height-request: 100;
+            top-margin: 12;
+            bottom-margin: 12;
+            right-margin: 12;
+            left-margin: 12;
+            wrap-mode: word;
+
+            styles [
+              "card"
+            ]
+          }
+        }
+
+        Adw.PreferencesGroup _seasons_group {
+          // visible: bind _series_btn.active;
+          visible: bind $_show_for_series(_toggle_group.active-name) as <bool>;
+          title: _("Seasons (required)");
+          description: _("Use the + button to add seasons");
+
+          [header-suffix]
+          Button {
+            Adw.ButtonContent {
+              label: _("Add");
+              icon-name: "plus";
+            }
+
+            clicked => $_on_season_add_btn_clicked();
+
+            styles [
+              "accent"
+            ]
+          }
+        }
+
+        Adw.PreferencesGroup {
+          title: _("Additional Information");
+
+          Adw.EntryRow _status_entry {
+            title: _("Status");
+          }
+
+          Adw.ComboRow _original_language_comborow {
+            title: _("Original Language");
+
+            model: StringList _language_model {};
+          }
+
+          Adw.EntryRow _original_title_entry {
+            title: _("Original Title");
+          }
+
+          Adw.SpinRow _budget_spinrow {
+            // visible: bind _movies_btn.active;
+            visible: bind $_show_for_movies(_toggle_group.active-name) as <bool>;
+            title: _("Budget (US$)");
+
+            adjustment: Adjustment {
+              lower: 0;
+              upper: 9999999999999999999;
+              step-increment: 1;
+            };
+          }
+
+          Adw.SpinRow _revenue_spinrow {
+            // visible: bind _movies_btn.active;
+            visible: bind $_show_for_movies(_toggle_group.active-name) as <bool>;
+            title: _("Revenue (US$)");
+
+            adjustment: Adjustment {
+              lower: 0;
+              upper: 9999999999999999999;
+              step-increment: 1;
+            };
+          }
+
+          Adw.ActionRow {
+            title: _("In production");
+            // visible: bind _series_btn.active;
+            visible: bind $_show_for_series(_toggle_group.active-name) as <bool>;
+            activatable-widget: _production_checkbtn;
+
+            [suffix]
+            CheckButton _production_checkbtn {
+              valign: center;
+            }
+          }
+        }
+      }
+    };
+  }
+}

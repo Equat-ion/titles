@@ -1,0 +1,497 @@
+// Copyright (C) 2023 Alessandro Iepure
+// 
+// SPDX-License-Identifier: GPL-3.0-or-later
+using Gtk 4.0;
+using Adw 1;
+
+template $DetailsView: Adw.NavigationPage {
+  child: Adw.ViewStack _view_stack {
+    Adw.ViewStackPage {
+      name: "filled";
+
+      child: Overlay {
+        Picture _background_picture {
+          content-fit: cover;
+          hexpand: true;
+        }
+
+        [overlay]
+        Adw.ToolbarView {
+          [top]
+          Adw.HeaderBar {
+            styles [
+              "flat"
+            ]
+
+            [end]
+            MenuButton _menu_btn {
+              icon-name: "open-menu";
+              menu-model: _primary_menu;
+              tooltip-text: _("Main Menu");
+            }
+          }
+
+          content: Adw.BreakpointBin {
+            width-request: 360;
+            height-request: 200;
+
+            Adw.Breakpoint _breakpoint {
+              condition ("max-width: 550sp")
+
+              setters {
+                main-details.orientation: vertical;
+                main-details.margin-start: 0;
+                main-details.margin-end: 0;
+                main-details.margin-bottom: 0;
+                main-details.spacing: 0;
+                _poster_picture.halign: center;
+                _poster_picture.margin-bottom: 20;
+                details.margin-start: 20;
+                details.margin-end: 20;
+                _description_box.margin-start: 20;
+                _description_box.margin-end: 20;
+                _creator_box.margin-start: 20;
+                _creator_box.margin-end: 20;
+                _seasons_box.margin-start: 20;
+                _seasons_box.margin-end: 20;
+                _additional_info_box.margin-start: 20;
+                _additional_info_box.margin-end: 20;
+                _notes_box.margin-start: 20;
+                _notes_box.margin-end: 20;
+              }
+
+              apply => $_on_breakpoint_applied();
+              unapply => $_on_breakpoint_unapplied();
+            }
+
+            child: ScrolledWindow scrolled-window {
+              child: Box {
+                orientation: vertical;
+
+                Box main-details {
+                  orientation: horizontal;
+                  margin-start: 50;
+                  margin-top: 25;
+                  margin-bottom: 50;
+                  margin-end: 50;
+                  spacing: 50;
+
+                  Picture _poster_picture {
+                    height-request: 300;
+                    width-request: 200;
+                    content-fit: fill;
+
+                    styles [
+                      "poster"
+                    ]
+                  }
+
+                  Box details {
+                    orientation: vertical;
+                    margin-end: 50;
+                    spacing: 6;
+
+                    Label _title_lbl {
+                      lines: 2;
+                      halign: start;
+                      wrap: true;
+
+                      styles [
+                        "title-1"
+                      ]
+                    }
+
+                    Label _tagline_lbl {
+                      visible: false;
+                      halign: start;
+                      wrap: true;
+                      lines: 2;
+
+                      styles [
+                        "heading"
+                      ]
+                    }
+
+                    Label _genres_lbl {
+                      visible: false;
+                      halign: start;
+                      wrap: true;
+                      lines: 2;
+                    }
+
+                    Box {
+                      orientation: horizontal;
+                      spacing: 6;
+
+                      Label _chip1_lbl {
+                        visible: false;
+
+                        styles [
+                          "caption",
+                          "chip"
+                        ]
+                      }
+
+                      Label _chip2_lbl {
+                        visible: false;
+
+                        styles [
+                          "caption",
+                          "chip"
+                        ]
+                      }
+
+                      Label _chip3_lbl {
+                        visible: false;
+                        tooltip-text: _("Number of Episodes");
+
+                        styles [
+                          "caption",
+                          "chip"
+                        ]
+                      }
+
+                      Label _chip4_lbl {
+                        visible: false;
+                        tooltip-text: _("Air Date of Next Episode");
+
+                        styles [
+                          "caption",
+                          "chip"
+                        ]
+                      }
+                    }
+
+                    Box {
+                      margin-top: 12;
+                      orientation: horizontal;
+
+                      Button _watched_btn {
+                        visible: false;
+
+                        child: Adw.ButtonContent _btn_content {};
+
+                        valign: center;
+                        margin-end: 16;
+
+                        styles [
+                          "pill"
+                        ]
+
+                        clicked => $_on_watched_btn_clicked();
+                      }
+
+                      Box {
+                        orientation: horizontal;
+                        spacing: 6;
+
+                        Adw.ToggleGroup _notify_group {
+                          styles [
+                            "round"
+                          ]
+
+                          visible: false;
+                          notify::active => $_on_notify_group_toggled();
+
+                          Adw.Toggle {
+                            icon-name: "bell-outline";
+                            label: "Notify me on new releases";
+                          }
+
+                          Adw.Toggle {
+                            icon-name: "bell-outline-none";
+                            label: "Silence notifications";
+                          }
+                        }
+
+                        Button _update_btn {
+                          icon-name: "update";
+                          tooltip-text: _("Update Metadata");
+                          valign: center;
+                          visible: false;
+
+                          styles [
+                            "circular"
+                          ]
+
+                          clicked => $_on_update_btn_clicked();
+                        }
+
+                        Button _edit_btn {
+                          icon-name: "document-edit";
+                          tooltip-text: _("Edit");
+                          valign: center;
+                          visible: false;
+
+                          styles [
+                            "circular"
+                          ]
+
+                          clicked => $_on_edit_btn_clicked();
+                        }
+
+                        Button _delete_btn {
+                          icon-name: "user-trash-symbolic";
+                          tooltip-text: _("Delete");
+                          valign: center;
+
+                          styles [
+                            "circular"
+                          ]
+
+                          clicked => $_on_delete_btn_clicked();
+                        }
+                      }
+                    }
+                  }
+                }
+
+                Box _description_box {
+                  orientation: vertical;
+                  visible: false;
+                  margin-start: 50;
+                  margin-end: 50;
+
+                  Separator {
+                    margin-top: 12;
+
+                    styles [
+                      "spacer"
+                    ]
+                  }
+
+                  Label {
+                    label: _("Description");
+                    halign: start;
+
+                    styles [
+                      "title-2"
+                    ]
+                  }
+
+                  Label _overview_lbl {
+                    halign: start;
+                    wrap: true;
+                  }
+                }
+
+                Separator {
+                  styles [
+                    "spacer"
+                  ]
+                }
+
+                Box _creator_box {
+                  visible: false;
+                  halign: start;
+                  orientation: vertical;
+                  margin-start: 50;
+                  margin-end: 50;
+
+                  Label {
+                    label: _("Created by");
+                    halign: start;
+
+                    styles [
+                      "heading"
+                    ]
+                  }
+
+                  Label _creator_lbl {
+                    halign: start;
+                  }
+                }
+
+                Separator {
+                  margin-bottom: 16;
+
+                  styles [
+                    "spacer"
+                  ]
+                }
+
+                Box _seasons_box {
+                  margin-start: 50;
+                  margin-end: 50;
+                  visible: false;
+                  orientation: vertical;
+
+                  Label {
+                    label: _("Seasons");
+                    halign: start;
+                    margin-bottom: 6;
+
+                    styles [
+                      "title-2"
+                    ]
+                  }
+
+                  Adw.PreferencesGroup _seasons_group {
+                    styles [
+                      "groupcolor"
+                    ]
+                  }
+
+                  Separator {
+                    margin-bottom: 16;
+
+                    styles [
+                      "spacer"
+                    ]
+                  }
+                }
+
+                Box _additional_info_box {
+                  valign: start;
+                  orientation: vertical;
+                  margin-start: 50;
+                  margin-end: 50;
+
+                  Label {
+                    label: _("Additional Information");
+                    halign: start;
+
+                    styles [
+                      "title-2"
+                    ]
+                  }
+
+                  FlowBox _flow_box {
+                    orientation: horizontal;
+                    hexpand: true;
+                    selection-mode: none;
+                    max-children-per-line: 12;
+                  }
+                }
+
+                Box _notes_box {
+                  orientation: vertical;
+                  margin-top: 10;
+                  margin-bottom: 20;
+                  margin-start: 50;
+                  margin-end: 50;
+
+                  Box {
+                    orientation: horizontal;
+                    spacing: 10;
+
+                    Label {
+                      label: _("Notes");
+                      halign: start;
+
+                      styles [
+                        "title-2"
+                      ]
+                    }
+
+                    Revealer _notes_save_revealer {
+                      reveal-child: false;
+                      transition-type: swing_right;
+
+                      child: Button _notes_save_btn {
+                        icon-name: "floppy";
+
+                        styles [
+                          "circular"
+                        ]
+
+                        clicked => $_on_notes_btn_clicked();
+                      };
+                    }
+                  }
+
+                  TextView _notes_textview {
+                    vexpand: true;
+                    wrap-mode: word;
+                    margin-top: 10;
+                    top-margin: 12;
+                    left-margin: 12;
+                    right-margin: 12;
+                    bottom-margin: 12;
+                    height-request: 100;
+
+                    styles [
+                      "notes",
+                      "card"
+                    ]
+                  }
+                }
+              };
+            };
+          };
+        }
+      };
+    }
+
+    Adw.ViewStackPage {
+      name: "loading";
+
+      child: Adw.ToolbarView {
+        [top]
+        Adw.HeaderBar {
+          styles [
+            "flat"
+          ]
+        }
+
+        content: Box {
+          orientation: vertical;
+          spacing: 12;
+          valign: center;
+          vexpand: true;
+
+          Adw.Spinner {}
+
+          Box {
+            orientation: vertical;
+            margin-start: 12;
+            margin-end: 12;
+
+            Label _loading_lbl {
+              label: "Loading Content…";
+              wrap: true;
+              halign: center;
+              justify: center;
+
+              styles [
+                "title-1"
+              ]
+            }
+
+            Label _status_lbl {
+              label: "Please wait, this might take a while.";
+              halign: center;
+              justify: center;
+              wrap: true;
+            }
+          }
+        };
+      };
+    }
+  };
+}
+
+menu _primary_menu {
+  section {
+    item {
+      custom: "themeswitcher";
+    }
+  }
+
+  section {
+    item {
+      label: _("_Preferences");
+      action: "app.preferences";
+    }
+
+    item {
+      label: _("_Keyboard Shortcuts");
+      action: "win.show-help-overlay";
+    }
+
+    item {
+      label: _("_About Ticket Booth");
+      action: "app.about";
+    }
+  }
+}

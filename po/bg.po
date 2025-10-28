@@ -1,0 +1,1315 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the ticketbooth package.
+# twlvnn <kraft_werk@tutanota.com>, 2024.
+msgid ""
+msgstr ""
+"Project-Id-Version: ticketbooth\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-11 10:41+0200\n"
+"PO-Revision-Date: 2024-04-08 20:35+0000\n"
+"Last-Translator: twlvnn <kraft_werk@tutanota.com>\n"
+"Language-Team: Bulgarian <https://hosted.weblate.org/projects/ticket-booth/"
+"ticket-booth/bg/>\n"
+"Language: bg\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.5-dev\n"
+
+#. TRANSLATORS: do not translate
+#: data/me.iepure.Ticketbooth.desktop.in:8
+msgid "@app_name@"
+msgstr "@app_name@"
+
+#: data/me.iepure.Ticketbooth.desktop.in:14
+msgid "Movies;Films;Shows;TV;Series;Anime;Watch;List;Library;"
+msgstr ""
+
+#: data/me.iepure.Ticketbooth.gschema.xml.in:15
+msgid "Window width"
+msgstr "Широчина на прозореца"
+
+#: data/me.iepure.Ticketbooth.gschema.xml.in:19
+msgid "Window height"
+msgstr "Височина на прозореца"
+
+#: data/me.iepure.Ticketbooth.gschema.xml.in:23
+msgid "Window maximized"
+msgstr "Максимизиран прозорец"
+
+#: data/me.iepure.Ticketbooth.gschema.xml.in:31
+msgid "Active tab"
+msgstr "Активен подпрозорец"
+
+#: data/me.iepure.Ticketbooth.gschema.xml.in:35
+msgid "Specifies if the app is run for the first time"
+msgstr "Дали приложението се изпълнява за първи път"
+
+#: data/me.iepure.Ticketbooth.gschema.xml.in:39
+#, fuzzy
+msgid "Specifies if the database needs an update"
+msgstr "Дали приложението е свалило необходимите данни"
+
+#: data/me.iepure.Ticketbooth.gschema.xml.in:43
+msgid "Specifies if the app downloaded the required data"
+msgstr "Дали приложението е свалило необходимите данни"
+
+#: data/me.iepure.Ticketbooth.gschema.xml.in:57
+msgid "View sorting style"
+msgstr "Показване на стила на сортиране"
+
+#: data/me.iepure.Ticketbooth.gschema.xml.in:61
+msgid "Separate watched content from unwatched"
+msgstr ""
+
+#: data/me.iepure.Ticketbooth.gschema.xml.in:65
+msgid "Hide watched content"
+msgstr ""
+
+#: data/me.iepure.Ticketbooth.gschema.xml.in:71
+msgid "Search bar visibility"
+msgstr ""
+
+#: data/me.iepure.Ticketbooth.gschema.xml.in:82
+#, fuzzy
+msgid "Search mode"
+msgstr "Търсене на заглавие"
+
+#: data/me.iepure.Ticketbooth.gschema.xml.in:86
+msgid "Search query"
+msgstr ""
+
+#: data/me.iepure.Ticketbooth.gschema.xml.in:98
+msgid "App color scheme"
+msgstr "Цветова схема на приложението"
+
+#: data/me.iepure.Ticketbooth.gschema.xml.in:102
+msgid "Language used by TMDB results"
+msgstr "Език, използван от резултатите на TMDB"
+
+#: data/me.iepure.Ticketbooth.gschema.xml.in:115
+msgid "Frequency to check for new data on TMDB"
+msgstr "Периодa na проверка за нови данни в TMDB"
+
+#: data/me.iepure.Ticketbooth.gschema.xml.in:119
+msgid "Last autoupdate date"
+msgstr "Дата на последно автоматично обновяване"
+
+#: data/me.iepure.Ticketbooth.gschema.xml.in:123
+#, fuzzy
+msgid "Last notification autoupdate date"
+msgstr "Дата на последно автоматично обновяване"
+
+#: data/me.iepure.Ticketbooth.gschema.xml.in:127
+msgid "Clear cache on exit"
+msgstr "Изчистване на кеша при спиране на програмата"
+
+#: data/me.iepure.Ticketbooth.gschema.xml.in:131
+msgid "Use the user's TMDB key"
+msgstr ""
+
+#: data/me.iepure.Ticketbooth.gschema.xml.in:135
+msgid "User's TMDB key"
+msgstr ""
+
+#: data/me.iepure.Ticketbooth.metainfo.xml.in:15 src/ui/about_dialog.blp:10
+msgid "Keep track of your favorite shows"
+msgstr "Следете любимите си предавания"
+
+#: data/me.iepure.Ticketbooth.metainfo.xml.in:20
+msgid ""
+"Ticket Booth allows you to build your watchlist of movies and TV Shows, keep "
+"track of watched titles, and find information about the latest releases."
+msgstr ""
+"„Ticket Booth“ ви позволява да съставите списък с филми и сериали, да ги "
+"следите, и да намирате информация за най-новите издания."
+
+#: data/me.iepure.Ticketbooth.metainfo.xml.in:22
+msgid ""
+"Ticket Booth does not allow you to watch or download content. This app uses "
+"the TMDB API but is not endorsed or certified by TMDB."
+msgstr ""
+"„Ticket Booth“ не ви позволява да гледате или изтегляте съдържание. Това "
+"приложение използва програмния интерфейс (API) на „The Movie "
+"Database“ (TMDB), но не е одобрено от TMDB."
+
+#: data/me.iepure.Ticketbooth.metainfo.xml.in:44
+msgid "Movie Library"
+msgstr ""
+
+#: data/me.iepure.Ticketbooth.metainfo.xml.in:48
+#, fuzzy
+msgid "Movie Details"
+msgstr "Филми"
+
+#: data/me.iepure.Ticketbooth.metainfo.xml.in:52
+#, fuzzy
+msgid "TV Series Library"
+msgstr "Сериал"
+
+#: data/me.iepure.Ticketbooth.metainfo.xml.in:56
+#, fuzzy
+msgid "TV Series Details"
+msgstr "Сериал"
+
+#: src/main.py:193
+msgid "Confirm Export?"
+msgstr ""
+
+#: src/main.py:194
+msgid ""
+"Exporting your library will create an archive containing all your data. You "
+"can import this archive later to restore your library."
+msgstr ""
+
+#: src/main.py:196 src/main.py:332 src/widgets/episode_row.py:272
+#: src/widgets/season_expander.py:146
+#, fuzzy
+msgctxt "alert dialog action"
+msgid "_Cancel"
+msgstr "_Отказване"
+
+#: src/main.py:197
+msgctxt "alert dialog action"
+msgid "_Export"
+msgstr ""
+
+#: src/main.py:230
+msgctxt "Background activity title"
+msgid "Exporting library"
+msgstr ""
+
+#: src/main.py:263
+msgid "Export Completed"
+msgstr ""
+
+#: src/main.py:264
+msgid "The library has been exported successfully."
+msgstr ""
+
+#: src/main.py:267 src/main.py:277 src/main.py:408 src/main.py:417
+#: src/preferences.py:256 src/window.py:235
+#, fuzzy
+msgctxt "alert dialog action"
+msgid "_OK"
+msgstr "Добре"
+
+#: src/main.py:273
+msgid "Export failed"
+msgstr ""
+
+#: src/main.py:274
+msgid "An error occurred while exporting the library."
+msgstr ""
+
+#: src/main.py:329
+msgid "Confirm Import?"
+msgstr ""
+
+#: src/main.py:330
+msgid ""
+"Importing a library will merge it with the current library. This action "
+"cannot be undone and in case of conflicts, the new data will be kept."
+msgstr ""
+
+#: src/main.py:333
+msgctxt "alert dialog action"
+msgid "_Import"
+msgstr ""
+
+#: src/main.py:366
+msgctxt "Background activity title"
+msgid "Importing library"
+msgstr ""
+
+#: src/main.py:404
+msgid "Import Completed"
+msgstr ""
+
+#: src/main.py:405
+msgid "The library has been imported successfully."
+msgstr ""
+
+#: src/main.py:413
+msgid "Import failed"
+msgstr ""
+
+#: src/main.py:414
+msgid ""
+"Please check the selected archive and try again. Only archives created by "
+"Ticket Booth are supported."
+msgstr ""
+
+#: src/preferences.py:253
+msgctxt "message dialog heading"
+msgid "No Network"
+msgstr "Няма връзка с мрежата"
+
+#: src/preferences.py:254
+msgctxt "message dialog body"
+msgid "Connect to the Internet to complete the setup."
+msgstr "Свържете се с Интернет, за да завършите първоначалните настройки."
+
+#: src/preferences.py:321
+msgctxt "Background activity title"
+msgid "Clear cache"
+msgstr "Изчистване на кеша"
+
+#. TRANSLATORS: {number} is the number of titles
+#: src/preferences.py:373 src/preferences.py:375
+#, python-brace-format
+msgid "{number} Titles"
+msgstr "{number} Заглавия"
+
+#: src/preferences.py:412
+msgctxt "Background activity title"
+msgid "Delete all movies"
+msgstr "Изтриване на всички филми"
+
+#: src/preferences.py:423
+msgctxt "Background activity title"
+msgid "Delete all TV Series"
+msgstr "Изтриване на всички сериали"
+
+#. TRANSLATORS: {total_space:.2f} is the total occupied space
+#: src/preferences.py:498
+#, python-brace-format
+msgid ""
+"Ticket Booth is currently using {total_space:.2f} MB. Use the options below "
+"to free some space."
+msgstr ""
+"„Ticket Booth“ в момента заема {total_space:.2f} МБ. Използвайте опциите по-"
+"долу, за да освободите пространство."
+
+#: src/preferences.py:502 src/preferences.py:504
+#, python-brace-format
+msgid "{space:.2f} MB occupied"
+msgstr "{space:.2f} МБ заети"
+
+#: src/window.py:232
+msgctxt "message dialog heading"
+msgid "Background Activies Running"
+msgstr "Дейности на фона се изпълняват"
+
+#: src/window.py:233
+msgctxt "message dialog body"
+msgid ""
+"Some activities are running in the background and need to be completed "
+"before exiting. Look for the indicator in the header bar to check when they "
+"are finished."
+msgstr ""
+"Няколко дейности се изпълняват във фона и трябва да приключат преди спиране "
+"на програмата. Потърсете индикатора в лентата със заглавието, за да "
+"проверите кога са приключени."
+
+#: src/dialogs/add_manual_dialog.py:90
+msgid "Edit Movie"
+msgstr "Редактиране на филма"
+
+#: src/dialogs/add_manual_dialog.py:93
+msgid "Edit TV Series"
+msgstr "Редактиране на сериала"
+
+#: src/dialogs/add_manual_dialog.py:296
+#, python-brace-format
+msgid "Season {num}"
+msgstr "Сезон {num}"
+
+#: src/dialogs/add_manual_dialog.py:336 src/widgets/search_result_row.py:165
+#, python-brace-format
+msgctxt "Background activity title"
+msgid "Add {title}"
+msgstr "Добавяне на {title}"
+
+#: src/dialogs/add_manual_dialog.py:342
+#, python-brace-format
+msgctxt "Background activity title"
+msgid "Update {title}"
+msgstr "Обновяване на {title}"
+
+#: src/dialogs/edit_season_dialog.py:44 src/widgets/season_expander.py:43
+msgid "Season"
+msgstr "Сезон"
+
+#. type: ignore
+#: src/pages/details_page.py:213 src/pages/details_page.py:311
+#: src/pages/details_page.py:373 src/pages/details_page.py:442
+#: src/pages/details_page.py:588 src/ui/views/content_view.blp:163
+#: src/ui/widgets/poster_button.blp:141 src/widgets/episode_row.py:129
+#: src/widgets/episode_row.py:160 src/widgets/episode_row.py:330
+msgid "Watched"
+msgstr "Гледано"
+
+#: src/pages/details_page.py:216 src/pages/details_page.py:314
+#: src/pages/details_page.py:376 src/pages/details_page.py:445
+#: src/pages/details_page.py:591 src/widgets/episode_row.py:132
+#: src/widgets/episode_row.py:163 src/widgets/episode_row.py:333
+msgid "Mark as Watched"
+msgstr "Маркирайте като гледано"
+
+#: src/pages/details_page.py:223
+#, fuzzy
+msgid "Runtime of Movie"
+msgstr "Времетраеност (минути)"
+
+#. TRANSLATORS: {num} is the total number of seasons
+#: src/pages/details_page.py:235
+#, python-brace-format
+msgid "{num} Season"
+msgid_plural "{num} Seasons"
+msgstr[0] "{num} Сезон"
+msgstr[1] "{num} Сезона"
+
+#: src/pages/details_page.py:239
+#, fuzzy
+msgid "Number of Seasons"
+msgstr "{num} Сезон"
+
+#. TRANSLATORS: {num} is the total number of episodes
+#: src/pages/details_page.py:244 src/pages/details_page.py:291
+#, python-brace-format
+msgid "{num} Episode"
+msgid_plural "{num} Episodes"
+msgstr[0] "{num} Епизод"
+msgstr[1] "{num} Епизода"
+
+#: src/pages/details_page.py:478 src/ui/dialogs/add_manual.blp:182
+msgid "Status"
+msgstr "Статус"
+
+#: src/pages/details_page.py:486 src/ui/dialogs/add_manual.blp:186
+msgid "Original Language"
+msgstr "Оригинален език"
+
+#: src/pages/details_page.py:496 src/ui/dialogs/add_manual.blp:192
+msgid "Original Title"
+msgstr "Оригинално заглавие"
+
+#: src/pages/details_page.py:509
+msgid "Budget"
+msgstr "Бюджет"
+
+#: src/pages/details_page.py:519
+msgid "Revenue"
+msgstr "Приходи"
+
+#: src/pages/details_page.py:529
+msgid "In Production"
+msgstr "В производство"
+
+#: src/pages/details_page.py:532
+msgid "Yes"
+msgstr "Да"
+
+#: src/pages/details_page.py:533
+msgid "No"
+msgstr "Не"
+
+#: src/pages/details_page.py:538
+msgid "TMDB ID"
+msgstr ""
+
+#. TRANSLATORS: {h} and {m} are the runtime hours and minutes respectively
+#: src/pages/details_page.py:564 src/widgets/episode_row.py:185
+#, python-brace-format
+msgid "{h}h {m}min"
+msgstr "{h}час(а) {m}мин"
+
+#. TRANSLATORS: {m} is the runtime minutes
+#: src/pages/details_page.py:567 src/widgets/episode_row.py:189
+#, python-brace-format
+msgid "{m}min"
+msgstr "{m}мин"
+
+#. TRANSLATORS: {title} is the showed content's title
+#: src/pages/details_page.py:650
+#, python-brace-format
+msgid "Updating {title}"
+msgstr "Обновява се {title}"
+
+#. TRANSLATORS: {title} is the content's title
+#: src/pages/details_page.py:657
+#, python-brace-format
+msgid "Update {title}"
+msgstr "Обновяване на {title}"
+
+#: src/pages/details_page.py:720
+msgid "Loading Metadata…"
+msgstr "Зареждане на метаданните…"
+
+#. TRANSLATORS: {title} is the content's title
+#: src/pages/details_page.py:740
+#, python-brace-format
+msgctxt "message dialog heading"
+msgid "Delete {title}?"
+msgstr "Изтриване на {title}?"
+
+#. type: ignore
+#: src/pages/details_page.py:742
+msgctxt "message dialog body"
+msgid "This title will be deleted from your watchlist."
+msgstr "Това заглавие ще бъде изтрито от списъка ви за гледане."
+
+#: src/pages/details_page.py:743
+msgctxt "message dialog action"
+msgid "_Cancel"
+msgstr "_Отказване"
+
+#: src/pages/details_page.py:744
+msgctxt "message dialog action"
+msgid "_Delete"
+msgstr "_Изтриване"
+
+#. TRANSLATORS: {title} is the content's title
+#: src/pages/details_page.py:777
+#, python-brace-format
+msgid "Delete {title}"
+msgstr "Изтриване на {title}"
+
+#: src/ui/about_dialog.blp:9
+msgid ""
+"Copyright © 2023 - 2025 Alessandro Iepure\n"
+"Some icons are copyright of the GNOME Project"
+msgstr ""
+
+#. TRANSLATORS: replace with your name (with optional email or website)
+#: src/ui/about_dialog.blp:16
+msgid "translator-credits"
+msgstr "twlvnn <kraft_werk@tutanota.com>"
+
+#: src/ui/dialogs/add_manual.blp:42 src/widgets/search_result_row.py:80
+msgctxt "Category"
+msgid "Movie"
+msgstr "Филм"
+
+#: src/ui/dialogs/add_manual.blp:47 src/views/main_view.py:63
+#: src/widgets/search_result_row.py:82
+msgctxt "Category"
+msgid "TV Series"
+msgstr "Сериал"
+
+#: src/ui/dialogs/add_manual.blp:55 src/ui/dialogs/edit_season.blp:24
+msgid "Cancel"
+msgstr "Отказване"
+
+#: src/ui/dialogs/add_manual.blp:61 src/ui/dialogs/edit_season.blp:30
+#: src/ui/pages/edit_episode_page.blp:19
+msgid "Save"
+msgstr "Запазване"
+
+#: src/ui/dialogs/add_manual.blp:86 src/ui/dialogs/edit_season.blp:52
+#: src/ui/pages/edit_episode_page.blp:41
+msgid "General"
+msgstr "Общи"
+
+#: src/ui/dialogs/add_manual.blp:89 src/ui/dialogs/edit_season.blp:55
+#: src/ui/pages/edit_episode_page.blp:55
+msgid "Title (required)"
+msgstr "Заглавие (задължителен)"
+
+#: src/ui/dialogs/add_manual.blp:94
+msgid "Release Date"
+msgstr "Дата на издаване"
+
+#: src/ui/dialogs/add_manual.blp:113
+msgid "Genres (comma separated)"
+msgstr "Жанрове (разделени със запетая)"
+
+#: src/ui/dialogs/add_manual.blp:119 src/ui/pages/edit_episode_page.blp:60
+msgid "Runtime (minutes)"
+msgstr "Времетраеност (минути)"
+
+#: src/ui/dialogs/add_manual.blp:129
+msgid "Tagline"
+msgstr "Слоган"
+
+#: src/ui/dialogs/add_manual.blp:135 src/ui/pages/details_page.blp:292
+msgid "Created by"
+msgstr "Създадено от"
+
+#: src/ui/dialogs/add_manual.blp:140 src/ui/pages/edit_episode_page.blp:71
+msgid "Overview"
+msgstr "Преглед"
+
+#: src/ui/dialogs/add_manual.blp:160
+msgid "Seasons (required)"
+msgstr "Сезони (задължителен)"
+
+#: src/ui/dialogs/add_manual.blp:161
+msgid "Use the + button to add seasons"
+msgstr "Използвайте бутона +, за да добавите сезони"
+
+#: src/ui/dialogs/add_manual.blp:166 src/ui/dialogs/edit_season.blp:67
+msgid "Add"
+msgstr "Добавяне"
+
+#: src/ui/dialogs/add_manual.blp:179 src/ui/pages/details_page.blp:351
+msgid "Additional Information"
+msgstr "Допълнителна информация"
+
+#: src/ui/dialogs/add_manual.blp:198
+msgid "Budget (US$)"
+msgstr "Бюджет (US$)"
+
+#: src/ui/dialogs/add_manual.blp:210
+msgid "Revenue (US$)"
+msgstr "Приходи (US$)"
+
+#: src/ui/dialogs/add_manual.blp:220
+msgid "In production"
+msgstr "В производство"
+
+#: src/ui/dialogs/add_tmdb.blp:27
+msgid "Search The Movie Database…"
+msgstr "Търсене в „The Movie Database“…"
+
+#: src/ui/dialogs/add_tmdb.blp:37
+msgid "Search For a Title"
+msgstr "Търсене на заглавие"
+
+#: src/ui/dialogs/add_tmdb.blp:39
+msgid ""
+"Start typing in the search bar to see a list of matching movies and TV series"
+msgstr ""
+"Започнете да пишете в лентата за търсене, за да видите списък със съвпадащи "
+"филми и сериали"
+
+#: src/ui/dialogs/add_tmdb.blp:46
+msgid "No Results Found"
+msgstr "Няма намерени резултати"
+
+#: src/ui/dialogs/add_tmdb.blp:48
+msgid "Try a different search"
+msgstr "Опитайте различно търсене"
+
+#: src/ui/dialogs/edit_season.blp:14
+msgid "Edit Season"
+msgstr "Редактиране на сезона"
+
+#: src/ui/dialogs/edit_season.blp:61
+msgid "Episodes (required)"
+msgstr "Епизоди (задължителен)"
+
+#: src/ui/dialogs/edit_season.blp:62
+msgid "Use the + button to add episodes"
+msgstr "Използвайте бутона +, за да добавите епизоди"
+
+#: src/ui/dialogs/message_dialogs.blp:9
+#, fuzzy
+msgctxt "message dialog heading"
+msgid "Clear Cached Data?"
+msgstr "Изчистване на кеша за данните от търсачката"
+
+#: src/ui/dialogs/message_dialogs.blp:10
+msgctxt "message dialog body"
+msgid ""
+"This operation will clear all stored cache data. It might get downloaded "
+"again next time you add content from TMDB."
+msgstr ""
+
+#: src/ui/dialogs/message_dialogs.blp:13 src/ui/dialogs/message_dialogs.blp:40
+#, fuzzy
+msgctxt "message dialog action"
+msgid "Cancel"
+msgstr "Отказване"
+
+#: src/ui/dialogs/message_dialogs.blp:14 src/ui/dialogs/message_dialogs.blp:41
+#, fuzzy
+msgctxt "message dialog action"
+msgid "Clear"
+msgstr "Изчистване на данните"
+
+#: src/ui/dialogs/message_dialogs.blp:19
+#, fuzzy
+msgctxt "message dialog heading"
+msgid "Clear Stored Data?"
+msgstr "Изчистване на данните"
+
+#: src/ui/dialogs/message_dialogs.blp:20
+msgctxt "message dialog body"
+msgid ""
+"This operation will permanentlly delete the selected data, loosing all your "
+"changes."
+msgstr ""
+
+#: src/ui/dialogs/message_dialogs.blp:26
+#, fuzzy
+msgid "Movies"
+msgstr "Филми"
+
+#: src/ui/dialogs/message_dialogs.blp:34
+#, fuzzy
+msgid "TV Series"
+msgstr "Сериал"
+
+#: src/ui/gtk/help-overlay.blp:15
+msgctxt "shortcut window"
+msgid "General"
+msgstr "Общи"
+
+#: src/ui/gtk/help-overlay.blp:18
+msgctxt "shortcut window"
+msgid "Show Shortcuts"
+msgstr "Показване на клавишните комбинации"
+
+#: src/ui/gtk/help-overlay.blp:23
+msgctxt "shortcut window"
+msgid "Show Preferences"
+msgstr "Показване на настройките"
+
+#: src/ui/gtk/help-overlay.blp:28
+#, fuzzy
+msgctxt "shortcut window"
+msgid "Search your Watchlist"
+msgstr "Вашият списък за гледане"
+
+#: src/ui/gtk/help-overlay.blp:33
+msgctxt "shortcut window"
+msgid "Quit"
+msgstr "Спиране на програмата"
+
+#: src/ui/gtk/help-overlay.blp:39
+msgctxt "shortcut window"
+msgid "Library management"
+msgstr "Управление на списъка"
+
+#: src/ui/gtk/help-overlay.blp:42
+msgctxt "shortcut window"
+msgid "Add title from TMDB"
+msgstr "Добавяне на заглавие от TMDB"
+
+#: src/ui/gtk/help-overlay.blp:47
+msgctxt "shortcut window"
+msgid "Add title manually"
+msgstr "Добавяне на заглавие ръчно"
+
+#: src/ui/gtk/help-overlay.blp:51
+msgctxt "shortcut window"
+msgid "Refresh library"
+msgstr "Обновяване на списъка"
+
+#: src/ui/pages/details_page.blp:30 src/ui/views/main_view.blp:84
+msgid "Main Menu"
+msgstr "Основно меню"
+
+#: src/ui/pages/details_page.blp:146
+#, fuzzy
+msgid "Number of Episodes"
+msgstr "{num} Епизод"
+
+#: src/ui/pages/details_page.blp:156
+msgid "Air Date of Next Episode"
+msgstr ""
+
+#: src/ui/pages/details_page.blp:209
+msgid "Update Metadata"
+msgstr "Обновяване на метаданните"
+
+#: src/ui/pages/details_page.blp:222 src/ui/widgets/episode_row.blp:87
+#: src/ui/widgets/season_expander.blp:42
+msgid "Edit"
+msgstr "Редактиране"
+
+#: src/ui/pages/details_page.blp:235
+msgid "Delete"
+msgstr "Изтриване"
+
+#: src/ui/pages/details_page.blp:264
+msgid "Description"
+msgstr "Описание"
+
+#: src/ui/pages/details_page.blp:320
+msgid "Seasons"
+msgstr "Сезони"
+
+#: src/ui/pages/details_page.blp:379
+msgid "Notes"
+msgstr ""
+
+#: src/ui/pages/details_page.blp:483 src/ui/views/main_view.blp:234
+msgid "_Preferences"
+msgstr "_Настройки"
+
+#: src/ui/pages/details_page.blp:488 src/ui/views/main_view.blp:239
+msgid "_Keyboard Shortcuts"
+msgstr "_Клавишни комбинации"
+
+#: src/ui/pages/details_page.blp:493 src/ui/views/main_view.blp:244
+msgid "_About Ticket Booth"
+msgstr "_Относно „Ticket Booth“"
+
+#: src/ui/pages/edit_episode_page.blp:9
+msgid "Edit Episode"
+msgstr "Редактиране на епизода"
+
+#: src/ui/pages/edit_episode_page.blp:45
+msgid "Episode Number (required)"
+msgstr "Номер на епизода (задължителен)"
+
+#: src/ui/preferences.blp:15 src/ui/views/main_view.blp:131
+msgid "Preferences"
+msgstr "Настройки"
+
+#: src/ui/preferences.blp:18
+msgctxt "preferences"
+msgid "Optional Download"
+msgstr "Изтегляне по избор"
+
+#: src/ui/preferences.blp:19
+#, fuzzy
+msgctxt "preferences"
+msgid ""
+"For a complete experience, a download of 15 KB is required. The initial "
+"setup could not retrieve the data automatically and thus offline mode has "
+"been activated. It will remain active until the setup is completed."
+msgstr ""
+"Необходимо е сваляне на 15 КБ. Първоначалното настройване не е свалило "
+"данните автоматично и затова е активиран режим „Изключен“. Той ще остане "
+"активен до приключване на първоначалното настройване."
+
+#. TRANSLATORS: When clicked, it completes the initial setup by downloading the optional data.
+#: src/ui/preferences.blp:23
+msgctxt "preferences"
+msgid "Complete Setup"
+msgstr "Завършване на настройките"
+
+#: src/ui/preferences.blp:34
+msgctxt "preferences"
+msgid "Offline Mode"
+msgstr "Режим „Изключен“"
+
+#: src/ui/preferences.blp:35
+msgctxt "preferences"
+msgid ""
+"Ticket Booth can work entirely offline. If you choose to run in this mode, "
+"some features that require the Internet and/or access to third party APIs "
+"will not be available."
+msgstr ""
+"„Ticket Booth“ може да работи изцяло в режим „Изключен“. Ако решите да "
+"работите в този режим, някой функции, които изискват достъп до Интернет или "
+"до програмни интерфейси (API) на трети лица, няма да бъдат достъпни."
+
+#: src/ui/preferences.blp:38
+msgctxt "preferences"
+msgid "Enable Offline Mode"
+msgstr "Активиране на режим „Изключен“"
+
+#: src/ui/preferences.blp:43
+msgctxt "preferences"
+msgid "The Movie Database (TMDB)"
+msgstr "The Movie Database (TMDB)"
+
+#: src/ui/preferences.blp:44
+msgctxt "preferences"
+msgid ""
+"TMDB provides localized metadata for most content. Ticket Booth will "
+"download it in your prefered language, selectable below. In case it is not "
+"available, it will fallback to English US and then to the content's original "
+"language. If neither are available, it will result in a blank string. Please "
+"consider <a href='https://www.themoviedb.org/bible/new_content'>contributing "
+"to TMDB</a>. Additionally, an automatic update is performed on a frequency "
+"of your choosing."
+msgstr ""
+"TMDB предоставя преведени метаданни за повечето съдържание. „Ticket Booth“ "
+"ще я изтели на предпочитания от вас език, който можете да изберете по-долу. "
+"В случай че той не е наличен, ще използва американски английски език и след "
+"това оригиналния език на съдържанието. Ако нито един от двата езика не е "
+"наличен, низа ще е празен. Моля, помислете дали да не <a href='https://www."
+"themoviedb.org/bible/new_content'>допринесете за TMDB</a>. Отделно се "
+"извършва автоматично обновяване през избран от вас период."
+
+#: src/ui/preferences.blp:47
+msgctxt "preferences"
+msgid "TMDB Results Language"
+msgstr "TMDB език за резултатите"
+
+#: src/ui/preferences.blp:52
+msgctxt "preferences"
+msgid "Update Frequency"
+msgstr "Период на обновяване"
+
+#: src/ui/preferences.blp:53
+msgctxt "preferences"
+msgid "Restart Ticket Booth after changing"
+msgstr "Рестартирайте „Ticket Booth“ след тази промяна"
+
+#: src/ui/preferences.blp:56
+msgctxt "preferences"
+msgid "Never"
+msgstr "Никога"
+
+#: src/ui/preferences.blp:57
+msgctxt "preferences"
+msgid "Daily"
+msgstr "Ежедневно"
+
+#: src/ui/preferences.blp:58
+msgctxt "preferences"
+msgid "Weekly"
+msgstr "Ежеседмично"
+
+#: src/ui/preferences.blp:59
+msgctxt "preferences"
+msgid "Monthly"
+msgstr "Ежемесечно"
+
+#: src/ui/preferences.blp:65
+msgctxt "preferences"
+msgid "Use Your API Key"
+msgstr ""
+
+#: src/ui/preferences.blp:66
+msgctxt "preferences"
+msgid ""
+"Register yours <a href='https://www.themoviedb.org/settings/api'>here</a>"
+msgstr ""
+
+#: src/ui/preferences.blp:70
+msgctxt "preferences"
+msgid "Your API key"
+msgstr ""
+
+#: src/ui/preferences.blp:75
+#, fuzzy
+msgctxt "preferences"
+msgid "Save Key"
+msgstr "Запазване"
+
+#: src/ui/preferences.blp:86
+msgctxt "preferences"
+msgid "Housekeeping"
+msgstr "Съхранение на данни"
+
+#: src/ui/preferences.blp:90
+msgctxt "preferences"
+msgid "Clear Cache on Exit"
+msgstr "Изчистване на кеша при спиране на програмата"
+
+#: src/ui/preferences.blp:94
+msgctxt "preferences"
+msgid "Clear Cached Search Data"
+msgstr "Изчистване на кеша за данните от търсачката"
+
+#: src/ui/preferences.blp:104
+msgctxt "preferences"
+msgid "Clear Data"
+msgstr "Изчистване на данните"
+
+#: src/ui/views/content_view.blp:14
+msgid "Your Watchlist Is Empty"
+msgstr "Вашият списък за гледане е празен"
+
+#: src/ui/views/content_view.blp:15
+#, fuzzy
+msgid "Add content with the + button or import from an older watchlist."
+msgstr "Добавете съдържание с бутона +."
+
+#: src/ui/views/content_view.blp:111 src/views/content_view.py:363
+msgid "Your Watchlist"
+msgstr "Вашият списък за гледане"
+
+#: src/ui/views/content_view.blp:140
+#, fuzzy
+msgid "Unwatched"
+msgstr "Гледано"
+
+#: src/ui/views/db_update_view.blp:29
+#, fuzzy
+msgid "Updating your watchlist"
+msgstr "Вече е в списъка за гледане"
+
+#: src/ui/views/db_update_view.blp:30
+msgid ""
+"After updating Ticket Booth we need to update the local database entries"
+msgstr ""
+
+#: src/ui/views/db_update_view.blp:49 src/ui/views/first_run_view.blp:55
+msgid "Use Offline Mode"
+msgstr "Използване на режим „Изключен“"
+
+#: src/ui/views/db_update_view.blp:55 src/ui/views/first_run_view.blp:61
+msgid "Try again on next run"
+msgstr "Опитайте отново при следващото стартиране"
+
+#: src/ui/views/db_update_view.blp:66
+msgid "Activate Notifications?"
+msgstr ""
+
+#: src/ui/views/db_update_view.blp:67
+msgid ""
+"Would you like to activate notifications for all series that are still in "
+"production and for all movies that have not yet released?"
+msgstr ""
+
+#: src/ui/views/db_update_view.blp:76
+#, fuzzy
+msgid "Activate"
+msgstr "Активен подпрозорец"
+
+#: src/ui/views/db_update_view.blp:85
+msgid "Deactivate"
+msgstr ""
+
+#: src/ui/views/main_view.blp:69
+msgid "Add a title to your library"
+msgstr "Добавете заглавие в списъка ви"
+
+#: src/ui/views/main_view.blp:76
+msgid "Show/Hide search bar"
+msgstr ""
+
+#: src/ui/views/main_view.blp:105
+msgctxt "Search mode"
+msgid "Title"
+msgstr ""
+
+#: src/ui/views/main_view.blp:106
+msgctxt "Search mode"
+msgid "Genre"
+msgstr ""
+
+#: src/ui/views/main_view.blp:107
+#, fuzzy
+msgctxt "Search mode"
+msgid "Overview"
+msgstr "Преглед"
+
+#: src/ui/views/main_view.blp:108
+msgctxt "Search mode"
+msgid "Notes"
+msgstr ""
+
+#: src/ui/views/main_view.blp:109
+msgctxt "Search mode"
+msgid "TMDB ID"
+msgstr ""
+
+#: src/ui/views/main_view.blp:119
+#, fuzzy
+msgid "Search Your Watchlist"
+msgstr "Вашият списък за гледане"
+
+#: src/ui/views/main_view.blp:130
+msgid "Offline Mode Enabled"
+msgstr "Режим на „Изключен“ е активиран"
+
+#: src/ui/views/main_view.blp:161
+msgid "_Sorting"
+msgstr "_Сортиране"
+
+#: src/ui/views/main_view.blp:165
+msgid "A-Z"
+msgstr "А-Я"
+
+#: src/ui/views/main_view.blp:171
+msgid "Z-A"
+msgstr "Я-А"
+
+#: src/ui/views/main_view.blp:177
+msgid "Date added (newest first)"
+msgstr "Дата на добавяне (най-новите първо)"
+
+#: src/ui/views/main_view.blp:183
+msgid "Date added (oldest first)"
+msgstr "Дата на добавяне (най-старите първо)"
+
+#: src/ui/views/main_view.blp:189
+msgid "Release date (newest first)"
+msgstr "Дата на издаване (най-новите първо)"
+
+#: src/ui/views/main_view.blp:195
+msgid "Release date (oldest first)"
+msgstr "Дата на издаване (най-старите първо)"
+
+#: src/ui/views/main_view.blp:203
+msgid "Separate watched from unwatched"
+msgstr ""
+
+#: src/ui/views/main_view.blp:208
+#, fuzzy
+msgid "Hide watched"
+msgstr "Гледано"
+
+#: src/ui/views/main_view.blp:215
+msgid "_Refresh"
+msgstr "_Презареждане"
+
+#: src/ui/views/main_view.blp:222
+msgid "_Import"
+msgstr ""
+
+#: src/ui/views/main_view.blp:227
+msgid "_Export"
+msgstr ""
+
+#: src/ui/views/main_view.blp:252
+msgid "From The Movie Database (TMDB)"
+msgstr "От „The Movie Database (TMDB)“"
+
+#: src/ui/views/main_view.blp:257
+msgid "Manually"
+msgstr "Ръчно"
+
+#: src/ui/widgets/background_indicator.blp:13
+msgid "Background Activities"
+msgstr "Дейности на фона"
+
+#: src/ui/widgets/background_indicator.blp:34
+msgid "No Background Activities"
+msgstr "Няма дейности на фона"
+
+#: src/ui/widgets/image_selector.blp:30
+msgid "Edit poster"
+msgstr "Редактиране на постера"
+
+#: src/ui/widgets/image_selector.blp:48
+msgid "Delete poster"
+msgstr "Изтриване на постера"
+
+#: src/ui/widgets/poster_button.blp:47
+msgid "The series has a new release"
+msgstr ""
+
+#: src/ui/widgets/poster_button.blp:67
+msgid "The series has a new release soon"
+msgstr ""
+
+#: src/ui/widgets/poster_button.blp:85
+msgid "This title is marked as watched"
+msgstr ""
+
+#: src/ui/widgets/search_result_row.blp:89
+msgid "Add to watchlist"
+msgstr "Добавяне в списъка за гледане"
+
+#: src/ui/widgets/theme_switcher.blp:29
+msgid "Follow system style"
+msgstr "Използване на системния стил"
+
+#: src/ui/widgets/theme_switcher.blp:43
+msgid "Light style"
+msgstr "Светъл стил"
+
+#: src/ui/widgets/theme_switcher.blp:57
+msgid "Dark style"
+msgstr "Тъмен стил"
+
+#: src/views/content_view.py:362
+msgid "Search results"
+msgstr ""
+
+#: src/views/first_run_view.py:101
+msgid "Waiting for Network…"
+msgstr "Изчаква се достъп до мрежата…"
+
+#: src/views/first_run_view.py:103
+msgid ""
+"For a complete experience, a download of 15 KB is required. However, if you "
+"are not connected to the Internet or don't want to wait, you can skip this "
+"step and continue offline without some features."
+msgstr ""
+"Необходимо е сваляне на 15 КБ. Ако обаче нямате връзка с Интернет или не "
+"искате да чакате, можете да пропуснете тази стъпка и да продължите в режим "
+"„Изключен“ без някой функции."
+
+#: src/views/first_run_view.py:107
+msgid "Getting things ready…"
+msgstr "Подготвяне на нещата…"
+
+#: src/views/first_run_view.py:108
+msgid "Downloading data"
+msgstr "Сваляне на данни"
+
+#: src/views/main_view.py:57
+msgctxt "Category"
+msgid "Movies"
+msgstr "Филми"
+
+#: src/views/main_view.py:146
+#, fuzzy
+msgctxt "Notification List activity title"
+msgid "Automatic update of notification list"
+msgstr "Автоматично обновяване"
+
+#: src/views/main_view.py:162 src/views/main_view.py:172
+#: src/views/main_view.py:182
+msgctxt "Background activity title"
+msgid "Automatic update"
+msgstr "Автоматично обновяване"
+
+#. TRANSLATOR: {title} is the title of the series
+#: src/views/main_view.py:326
+#, fuzzy, python-brace-format
+msgid "New release for {title}"
+msgstr "Изтриване на {title}"
+
+#. TRANSLATOR: {title} is the title of the series and {days} the number of days
+#: src/views/main_view.py:329
+#, python-brace-format
+msgid "A new episode of {title} was released {days} day ago."
+msgstr ""
+
+#. TRANSLATOR: {num} is the number of TV Series
+#: src/views/main_view.py:333
+#, python-brace-format
+msgid "New release for {num} TV series on your watchlist"
+msgstr ""
+
+#. TRANSLATOR: {series} is a list of TV series seperated by a comma
+#. TRANSLATOR: {series} is a list of all series affected seperated by a comma
+#: src/views/main_view.py:337 src/views/main_view.py:355
+#: src/views/main_view.py:372
+#, python-brace-format
+msgid "The TV Series are {series}."
+msgstr ""
+
+#. TRANSLATOR: {title} is the title of the series with a new episode soon
+#: src/views/main_view.py:343
+#, python-brace-format
+msgid "{title} will have a release soon"
+msgstr ""
+
+#. TRANSLATOR: {title} is the title of the series and {days} the number of days
+#: src/views/main_view.py:346
+#, python-brace-format
+msgid "A new episode will release in {days} day."
+msgstr ""
+
+#. TRANSLATOR: {num} is the number of TV Series
+#: src/views/main_view.py:350
+#, python-brace-format
+msgid "{num} TV Series on your watchlist will have a new episode soon"
+msgstr ""
+
+#. TRANSLATOR: {title} is the title of the series that has gone out of production
+#: src/views/main_view.py:361
+#, python-brace-format
+msgid "{title} has gone out of production"
+msgstr ""
+
+#. TRANSLATOR: {title} is the title of the series that has gone out of production
+#: src/views/main_view.py:364
+#, python-brace-format
+msgid ""
+"{title} has wrapped up its run. Now is the perfect time to revisit your "
+"favorite moments or find the next binge!"
+msgstr ""
+
+#. TRANSLATOR: {num} is the number of TV Series
+#: src/views/main_view.py:367
+#, python-brace-format
+msgid "{num} TV Series of your watchlist have gone out of production"
+msgstr ""
+
+#. TRANSLATOR: {title} is the title of the movie that has had its release
+#: src/views/main_view.py:378
+#, python-brace-format
+msgid "{title} has had its release!"
+msgstr ""
+
+#. TRANSLATOR: {title} is the title of the series and {days} the number of days
+#: src/views/main_view.py:381
+#, python-brace-format
+msgid "{title} was released {days} day ago."
+msgstr ""
+
+#: src/views/main_view.py:384
+#, python-brace-format
+msgid "{num} movies on your watchlist have had their releases."
+msgstr ""
+
+#. TRANSLATOR: {movies} is a list of all movies affected seperated by a comma
+#. TRANSLATOR: {movies} will be list of all series affected seperated by a comma
+#: src/views/main_view.py:388 src/views/main_view.py:403
+#, python-brace-format
+msgid "The movies are {movies}."
+msgstr ""
+
+#. TRANSLATOR: {title} is the title of the movie that will have its release soon
+#: src/views/main_view.py:393
+#, python-brace-format
+msgid "{title} will have its release soon!"
+msgstr ""
+
+#. TRANSLATOR: {title} is the title of the movie and {days} the number of days
+#: src/views/main_view.py:396
+#, python-brace-format
+msgid "{title} will have its release in {days} day."
+msgstr ""
+
+#. TRANSLATOR: {num} is the number of movies
+#: src/views/main_view.py:400
+#, python-brace-format
+msgid "{num} movies on your watchlist will have their releases soon"
+msgstr ""
+
+#. TRANSLATOR: {num} is the number of affected items
+#: src/views/main_view.py:413
+#, python-brace-format
+msgid "{num} items of your watchlist have an update"
+msgstr ""
+
+#. TRANSLATOR: {count_movies} is the number of movies
+#: src/views/main_view.py:418 src/views/main_view.py:427
+#, python-brace-format
+msgid "These updates affect {count_movies} movie"
+msgstr ""
+
+#. TRANSLATOR: the connector between the two parts of the sentence (foo and bar)
+#: src/views/main_view.py:420
+msgid " and "
+msgstr ""
+
+#. TRANSLATOR: {count_series} is the number of series
+#: src/views/main_view.py:422
+#, python-brace-format
+msgid " {count_series} TV serie"
+msgstr ""
+
+#. TRANSLATOR: {count_series} is the number of series
+#: src/views/main_view.py:430
+#, python-brace-format
+msgid "These updates affect {count_series} TV serie"
+msgstr ""
+
+#: src/widgets/episode_row.py:267 src/widgets/season_expander.py:141
+#, fuzzy, python-brace-format
+msgctxt "alert dialog heading"
+msgid "Delete {title}?"
+msgstr "Изтриване на {title}?"
+
+#: src/widgets/episode_row.py:270
+#, fuzzy
+msgctxt "alert dialog body"
+msgid "All changes to this episode will be lost."
+msgstr "Всички промени към този епизод ще бъдат изгубени."
+
+#: src/widgets/episode_row.py:273 src/widgets/season_expander.py:147
+#, fuzzy
+msgctxt "alert dialog action"
+msgid "_Delete"
+msgstr "_Изтриване"
+
+#: src/widgets/search_result_row.py:100 src/widgets/search_result_row.py:192
+msgid "Already in your watchlist"
+msgstr "Вече е в списъка за гледане"
+
+#: src/widgets/season_expander.py:144
+#, fuzzy
+msgctxt "alert dialog body"
+msgid "This season contains unsaved metadata."
+msgstr "Този сезон съдържа незапазени метаданни."
+
+#, fuzzy
+#~ msgid "movie"
+#~ msgstr "Филм"
+
+#, fuzzy
+#~ msgid "movies"
+#~ msgstr "Филми"
+
+#, fuzzy
+#~ msgid "series"
+#~ msgstr "Сериал"

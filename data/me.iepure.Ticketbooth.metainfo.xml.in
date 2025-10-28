@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Copyright (C) 2023 Alessandro Iepure
+
+SPDX-License-Identifier: CC0-1.0
+-->
+
+<component type="desktop-application">
+	<id>@app_id@</id>
+	<metadata_license>CC0-1.0</metadata_license>
+	<project_license>GPL-3.0-or-later</project_license>
+	<name translate="no">Ticket Booth</name>
+	<launchable type="desktop-id">@app_id@.desktop</launchable>
+	<summary>Keep track of your favorite shows</summary>
+	<developer id="me.iepure">
+		<name translate="no">Alessandro Iepure</name>
+	</developer>
+	<description>
+		<p>Ticket Booth allows you to build your watchlist of movies and TV Shows, keep track of
+			watched titles, and find information about the latest releases.</p>
+		<p> Ticket Booth does not allow you to watch or download content. This app uses the TMDB API
+			but is not endorsed or certified by TMDB.</p>
+	</description>
+	<url type="homepage">https://github.com/aleiepure/ticketbooth</url>
+	<url type="bugtracker">https://github.com/aleiepure/ticketbooth/issues</url>
+	<url type="vcs-browser">https://github.com/aleiepure/ticketbooth</url>
+	<url type="contribute">https://github.com/aleiepure/ticketbooth/blob/main/CONTRIBUTING.md</url>
+	<branding>
+		<color type="primary" scheme_preference="light">#e28dad</color>
+		<color type="primary" scheme_preference="dark">#9e4768</color>
+	</branding>
+	<recommends>
+		<control>keyboard</control>
+		<control>pointing</control>
+		<control>touch</control>
+	</recommends>
+	<requires>
+		<display_length compare="ge">360</display_length>
+	</requires>
+	<screenshots>
+		<screenshot type="default">
+			<image>https://raw.githubusercontent.com/aleiepure/ticketbooth/main/data/appstream/new1.png</image>
+			<caption translate="no">Movie Library</caption>
+		</screenshot>
+		<screenshot>
+			<image>https://raw.githubusercontent.com/aleiepure/ticketbooth/main/data/appstream/new2.png</image>
+			<caption translate="no">Movie Details</caption>
+		</screenshot>
+		<screenshot>
+			<image>https://raw.githubusercontent.com/aleiepure/ticketbooth/main/data/appstream/new3.png</image>
+			<caption translate="no">TV Series Library</caption>
+		</screenshot>
+		<screenshot>
+			<image>https://raw.githubusercontent.com/aleiepure/ticketbooth/main/data/appstream/new4.png</image>
+			<caption translate="no">TV Series Details</caption>
+		</screenshot>
+	</screenshots>
+	<translation type="gettext">me.iepure.ticketbooth</translation>
+	<content_rating type="oars-1.1" />
+	<releases>
+		<release version="1.2.0" date="2025-05-11">
+			<description translate="no">
+				<p>What's Changed</p>
+				<ul>
+					<li>Added search functionality for notes, overview, and by ID</li>
+					<li>Resolved issue with background stretching during window resizing</li>
+					<li>Sorting now functions correctly when separating watched and unwatched content</li>
+					<li>Improved notification toggle appearance</li>
+					<li>Dialogs now appear after completing import or export</li>
+					<li>Updated to GNOME platform 48</li>
+					<li>UI uses new libadwaita 1.7 widgets</li>
+					<li>Updated translations</li>
+				</ul>
+			</description>
+		</release>
+		<release version="1.1.1" date="2025-02-22">
+			<description translate="no">
+				<p>What's Changed</p>
+				<ul>
+					<li>Fixed a bug that prevented deleting content from your library (@farao)</li>
+					<li>Fixed a bug that prevented adding content on fresh installs without restarting the app first (@gnesterif)</li>
+					<li>Updated translations</li>
+				</ul>
+				<p>A huge thanks to all contributors and translators for making this release possible!</p>
+			</description>
+		</release>
+		<release version="1.1" date="2025-02-18">
+			<description translate="no">
+				<p>What's Changed</p>
+				<ul>
+					<li>Revamped UI with updated widgets, refined theming (@gnesterif), and a fully responsive design for use on smaller devices</li>
+					<li>Stay in the loop with notifications for new releases and updates (thanks to @gnesterif)</li>
+					<li>Find what you're looking by searching by title or genre</li>
+					<li>Keep your library organized by automatically separating watched and unwatched content</li>
+					<li>Take full control of your library with import and export functions</li>
+					<li>Personalize your experience by adding custom notes to your movies and shows</li>
+					<li>Updated translations</li>
+				</ul>
+				<p>A huge thanks to all contributors and translators for making this release possible!</p>
+			</description>
+		</release>
+		<release version="1.0.3.1" date="2023-10-02">
+			<description translate="no">
+				<p>Fixed issue that prevented application start with version 1.0.3</p>
+			</description>
+		</release>
+		<release version="1.0.3" date="2023-10-02">
+			<description translate="no">
+				<p>Stability improvements: fixed high peaks utilization and crashing. </p>
+			</description>
+		</release>
+		<release version="1.0.2" date="2023-09-27">
+			<description translate="no">
+				<p>What's Changed</p>
+				<ul>
+					<li>Stability improvements</li>
+					<li>Fix spelling errors by @librizzia</li>
+					<li>Translations update</li>
+				</ul>
+			</description>
+		</release>
+		<release version="1.0.1" date="2023-09-25">
+			<description translate="no">
+				<p>Fixes issue that prevented the addition of movies with large budgets and revenues.</p>
+			</description>
+		</release>
+		<release version="1.0" date="2023-09-21">
+			<description translate="no">
+				<p>First release</p>
+			</description>
+		</release>
+	</releases>
+</component>
