@@ -1,0 +1,9 @@
+{
+	"servers": {
+		"adwaita-mcp": {
+			"url": "http://localhost:4589/sse",
+			"type": "http"
+		}
+	},
+	"inputs": []
+}
